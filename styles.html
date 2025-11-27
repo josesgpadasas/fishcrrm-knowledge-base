@@ -671,6 +671,88 @@
     border-color: #151269;
     box-shadow: 0 0 0 0.2rem rgba(21, 18, 105, 0.25);
   }
+  
+  /* Municipalities table wrapper - maximize width and enable horizontal scrolling */
+  .municipalities-table-wrapper {
+    overflow-x: auto !important;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Maximize table width on larger screens */
+  .municipalities-table {
+    width: 100%;
+    min-width: 100%;
+    margin: 0;
+    table-layout: auto;
+  }
+  
+  /* Column widths to maximize space usage */
+  .municipalities-table thead th:first-child {
+    width: 15%;
+    min-width: 120px;
+  }
+  
+  .municipalities-table thead th:nth-child(2) {
+    width: 25%;
+    min-width: 150px;
+  }
+  
+  .municipalities-table thead th:nth-child(3) {
+    width: 25%;
+    min-width: 150px;
+  }
+  
+  .municipalities-table thead th:nth-child(4) {
+    width: 35%;
+    min-width: 200px;
+  }
+  
+  @media (max-width: 991.98px) {
+    /* Horizontal scrolling wrapper on smaller screens */
+    .municipalities-table-wrapper {
+      overflow-x: auto !important;
+      overflow-y: visible;
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+    
+    /* Table maintains minimum width for readability, but can expand */
+    .municipalities-table {
+      min-width: 700px !important;
+      width: auto !important;
+      margin: 0;
+    }
+    
+    .municipalities-table thead th,
+    .municipalities-table tbody td {
+      white-space: nowrap; /* Prevent text wrapping on mobile */
+    }
+    
+    /* Allow wrapping for long content in municipality column */
+    .municipalities-table tbody td:nth-child(4) {
+      white-space: normal;
+      min-width: 200px;
+    }
+  }
+  
+  @media (max-width: 575.98px) {
+    .municipalities-table {
+      min-width: 600px !important;
+    }
+    
+    .municipalities-table thead th,
+    .municipalities-table tbody td {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.875rem;
+    }
+  }
 
   /* === DIRECTORY TABLE === */
   #dir-table tbody tr {
