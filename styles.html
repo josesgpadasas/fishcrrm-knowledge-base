@@ -991,6 +991,93 @@
     color: #0f1056;
     text-decoration: underline;
   }
+  
+  /* Directory table wrapper - maximize width and enable horizontal scrolling */
+  .directory-table-wrapper {
+    overflow-x: auto !important;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Maximize table width on larger screens */
+  .directory-table {
+    width: 100%;
+    min-width: 100%;
+    margin: 0;
+    table-layout: auto;
+  }
+  
+  /* Column widths to maximize space usage */
+  .directory-table thead th:first-child {
+    width: 20%;
+    min-width: 150px;
+  }
+  
+  .directory-table thead th:nth-child(2) {
+    width: 20%;
+    min-width: 120px;
+  }
+  
+  .directory-table thead th:nth-child(3) {
+    width: 25%;
+    min-width: 150px;
+  }
+  
+  .directory-table thead th:nth-child(4) {
+    width: 20%;
+    min-width: 120px;
+  }
+  
+  .directory-table thead th:nth-child(5) {
+    width: 15%;
+    min-width: 150px;
+  }
+  
+  @media (max-width: 991.98px) {
+    /* Horizontal scrolling wrapper on smaller screens */
+    .directory-table-wrapper {
+      overflow-x: auto !important;
+      overflow-y: visible;
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+    
+    /* Table maintains minimum width for readability, but can expand */
+    .directory-table {
+      min-width: 800px !important;
+      width: auto !important;
+      margin: 0;
+    }
+    
+    .directory-table thead th,
+    .directory-table tbody td {
+      white-space: nowrap; /* Prevent text wrapping on mobile */
+    }
+    
+    /* Allow wrapping for long content in email column */
+    .directory-table tbody td:nth-child(5) {
+      white-space: normal;
+      min-width: 150px;
+    }
+  }
+  
+  @media (max-width: 575.98px) {
+    .directory-table {
+      min-width: 700px !important;
+    }
+    
+    .directory-table thead th,
+    .directory-table tbody td {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.875rem;
+    }
+  }
 
   /* Directory Tab Buttons */
   #dirTabs {
