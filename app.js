@@ -2,7 +2,7 @@
 // Replaces scripts.html functionality with client-side data fetching
 
 const ROUTES = {
-  'home': 'index',
+  'home': 'home',
   'structure': 'structure',
   'municipalities': 'municipalities',
   'activities': 'activities',
@@ -92,7 +92,6 @@ async function navigate(hash) {
       throw new Error(`Failed to load page: ${response.statusText}`);
     }
     const html = await response.text();
-    
     main.innerHTML = html;
     
     // Update URL
