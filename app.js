@@ -404,11 +404,28 @@ function initializeApp() {
   navigate(hash);
 }
 
-// Handle page load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
+// Handle page load - wait for DOM and scripts to be ready
+function startApp() {
+  // Ensure page-content exists
+  const main = document.getElementById('page-content');
+  if (!main) {
+    console.error('page-content element not found, retrying...');
+    setTimeout(startApp, 100);
+    return;
+  }
+  
+  // Clear any existing content
+  main.innerHTML = '';
+  
+  // Initialize
   initializeApp();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startApp);
+} else {
+  // DOM already loaded, but wait a bit for scripts
+  setTimeout(startApp, 50);
 }
 
 // Handle hash changes
