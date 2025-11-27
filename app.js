@@ -337,20 +337,33 @@ async function loadReferences() {
 
 async function loadFMAProfile() {
   const container = document.getElementById('fma-profile-container');
-  if (!container) return;
+  if (!container) {
+    console.error('FMA profile container not found');
+    return;
+  }
+  
+  console.log('Loading FMA Profile...');
   
   try {
     const data = await dataService.getFMAProfile();
+    console.log('FMA Profile data received:', data);
+    console.log('Data length:', data ? data.length : 0);
     
     if (!data || data.length === 0) {
+      console.warn('No FMA profile data available');
       container.innerHTML = `
         <div class="text-center py-5 text-muted">
           <i class="bi bi-inbox display-6 d-block mb-2 opacity-50"></i>
           <p class="mb-0">No FMA profile data available.</p>
+          <small class="text-muted">Please check that the FMA_Profile sheet exists and has data.</small>
         </div>
       `;
       return;
     }
+    
+    // Log first row to see structure
+    console.log('First row sample:', data[0]);
+    console.log('Available keys in first row:', Object.keys(data[0] || {}));
 
     // Group rows by Key Characteristics (case-insensitive, trimmed)
     const grouped = {};
@@ -406,6 +419,19 @@ async function loadFMAProfile() {
       });
     });
 
+    if (tableRows.length === 0) {
+      console.warn('No table rows generated from data');
+      container.innerHTML = `
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-inbox display-6 d-block mb-2 opacity-50"></i>
+          <p class="mb-0">No FMA profile data available.</p>
+          <small class="text-muted">Data was received but could not be processed.</small>
+        </div>
+      `;
+      return;
+    }
+
+    console.log(`Generating table with ${tableRows.length} rows`);
     container.innerHTML = `
       <div class="table-responsive rounded-3 border shadow-sm">
         <table class="table table-hover mb-0 align-middle">
@@ -431,13 +457,17 @@ async function loadFMAProfile() {
         </table>
       </div>
     `;
+    console.log('FMA Profile table rendered successfully');
   } catch (err) {
     console.error('Load FMA Profile error:', err);
+    console.error('Error stack:', err.stack);
+    const errorMessage = err.message || 'Unknown error';
     container.innerHTML = `
       <div class="alert alert-danger rounded-4 text-center py-4">
         <i class="bi bi-exclamation-triangle display-6"></i>
         <p class="mt-3 mb-0">Failed to load FMA profile data. Please try again.</p>
-        <small class="text-muted">Error: ${escapeHtml(err.message)}</small>
+        <small class="text-muted d-block mt-2">Error: ${escapeHtml(errorMessage)}</small>
+        <small class="text-muted">Check the browser console (F12) for more details.</small>
       </div>
     `;
   }
