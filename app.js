@@ -58,7 +58,7 @@ function debounce(func, wait) {
 async function navigate(hash) {
   if (!hash) hash = '#home';
   const page = hash.split('?')[0].replace('#', '') || 'home';
-  const route = ROUTES[page] || 'index';
+  const route = ROUTES[page] || 'home'; // Default to 'home' instead of 'index'
   const main = document.getElementById('page-content');
   
   if (!main) {
@@ -87,11 +87,13 @@ async function navigate(hash) {
 
   try {
     // Load page HTML
+    console.log(`Loading page: ${page}, route: ${route}, fetching: ${route}.html`);
     const response = await fetch(`${route}.html`);
     if (!response.ok) {
-      throw new Error(`Failed to load page: ${response.statusText}`);
+      throw new Error(`Failed to load page: ${response.status} ${response.statusText}`);
     }
     const html = await response.text();
+    console.log(`Successfully loaded ${route}.html, length: ${html.length}`);
     main.innerHTML = html;
     
     // Update URL
@@ -104,7 +106,7 @@ async function navigate(hash) {
     document.documentElement.scrollTop = 0;
   } catch (err) {
     console.error('Navigation error:', err);
-    main.innerHTML = `<div class="alert alert-danger">Failed to load page: ${escapeHtml(err.message)}</div>`;
+    main.innerHTML = `<div class="alert alert-danger m-4">Failed to load page: ${escapeHtml(err.message)}<br><small>Route: ${route}.html</small></div>`;
   }
 }
 
@@ -389,23 +391,16 @@ window.globalSearch = (query) => {
 function initializeApp() {
   let hash = window.location.hash;
   
-  if (!hash || hash === '#') {
-    try {
-      const lastPage = localStorage.getItem('lastPage');
-      if (lastPage && lastPage !== '#') {
-        hash = lastPage;
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, '', hash);
-        }
-      } else {
-        hash = '#home';
-      }
-    } catch (e) {
-      console.warn('localStorage not available:', e);
-      hash = '#home';
+  // If no hash, default to home
+  if (!hash || hash === '#' || hash === '') {
+    hash = '#home';
+    // Update URL without triggering navigation
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', hash);
     }
   }
   
+  console.log('Initializing app with hash:', hash);
   navigate(hash);
 }
 
