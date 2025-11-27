@@ -66,6 +66,11 @@ async function navigate(hash) {
     return;
   }
   
+  // Remove FMA profile page class if navigating away
+  if (page !== 'fmaprofile') {
+    document.body.classList.remove('fma-profile-page');
+  }
+  
   // Store current page in localStorage
   try {
     localStorage.setItem('lastPage', hash);
@@ -1207,6 +1212,9 @@ async function loadFMAProfile() {
     return;
   }
   
+  // Add class to body for CSS targeting
+  document.body.classList.add('fma-profile-page');
+  
   console.log('Loading FMA Profile...');
   
   try {
@@ -1298,8 +1306,8 @@ async function loadFMAProfile() {
 
     console.log(`Generating table with ${tableRows.length} rows`);
     container.innerHTML = `
-      <div class="table-responsive rounded-3 border shadow-sm" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
-        <table class="table table-hover mb-0 align-middle" style="min-width: 700px;">
+      <div class="table-responsive rounded-3 border shadow-sm" style="overflow-x: auto !important; overflow-y: visible; -webkit-overflow-scrolling: touch; display: block; width: 100%; max-width: 100%;">
+        <table class="table table-hover mb-0 align-middle" style="min-width: 700px; width: auto; margin: 0;">
           <thead style="background: #f8f9fa;">
             <tr>
               <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 30%; text-align: left;">Key Characteristics</th>
