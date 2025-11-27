@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FishCRRM 1.1 Knowledge Base</title>
+  
+  <!-- Include styles -->
+  <link rel="icon" type="image/svg+xml"
+    href="https://upload.wikimedia.org/wikipedia/commons/9/97/National_Fisheries_Research_and_Development_Institute_%28NFRDI%29.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Science+Gothic&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- Load styles.html content inline -->
+  <style id="app-styles"></style>
+  
+  <!-- Configuration and Data Service -->
+  <script src="config.js"></script>
+  <script src="data-service.js"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm">
+    <div class="container-fluid" style="max-width: 95%;">
+      <a class="navbar-brand d-flex align-items-center" href="#home" onclick="event.preventDefault(); navigate('#home')">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/9/97/National_Fisheries_Research_and_Development_Institute_%28NFRDI%29.svg"
+          alt="NFRDI Logo" width="45" height="45" class="me-2 rounded-circle bg-white p-1"
+          title="National Fisheries Research and Development Institute">
+        <span class="fw-bold">FishCRRM 1.1</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link px-3" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#structure">Implementation Structure</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#fmaprofile">FMA Profile</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#municipalities">Municipalities</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#activities">Activities</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#directory">Directory</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#references">References</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#about">About</a></li>
+        </ul>
+        <form class="d-flex" onsubmit="globalSearch(this.querySelector('input').value); return false;">
+          <div class="input-group">
+            <input class="form-control border-0 bg-white bg-opacity-10 text-white" type="search"
+              placeholder="Search..." id="global-search" style="backdrop-filter: blur(5px);">
+            <button class="btn btn-outline-light border-0" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container-fluid pt-0" id="page-content" style="max-width: 95%;">
+    <!-- Content will be loaded here -->
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-light py-5 mt-auto position-relative overflow-hidden">
+    <div class="position-absolute top-0 start-0 w-100 h-100"
+      style="background: linear-gradient(180deg, #0f1056 0%, #000 100%); opacity: 0.95; z-index: -1;"></div>
+    <div class="container-fluid text-center position-relative z-1" style="max-width: 95%;">
+      <div class="mb-4">
+        <h5 class="fw-bold mb-1 text-white">FishCRRM 1.1 Knowledge Base</h5>
+      </div>
+      <hr class="border-secondary opacity-25 w-50 mx-auto my-4">
+      <div class="d-flex justify-content-center gap-3 mb-4">
+        <a href="https://www.facebook.com/nfrdiphilippines/" class="text-white-50 hover-white transition-all"><i class="bi bi-facebook fs-5"></i></a>
+        <a href="https://x.com/DA_NFRDI" class="text-white-50 hover-white transition-all"><i class="bi bi-twitter-x fs-5"></i></a>
+        <a href="https://nfrdi.da.gov.ph/" class="text-white-50 hover-white transition-all"><i class="bi bi-globe fs-5"></i></a>
+      </div>
+      <small class="text-white-50">
+        &copy; 2025 NFRDI - FishCoRe Project Management Office - FishCRRM 1.1. <br>
+        Powered by Google Sheets API.
+      </small>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="app-toast" class="toast align-items-center text-white bg-success border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Load styles and scripts -->
+  <script>
+    // Load styles.html content
+    fetch('styles.html')
+      .then(response => response.text())
+      .then(html => {
+        // Extract style tag content
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const styleTag = doc.querySelector('style');
+        if (styleTag) {
+          document.getElementById('app-styles').textContent = styleTag.textContent;
+        }
+      })
+      .catch(err => console.error('Error loading styles:', err));
+  </script>
+  
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>

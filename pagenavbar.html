@@ -1,0 +1,36 @@
+<!-- pagenavbar.html -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm">
+  <div class="container-fluid" style="max-width: 95%;">
+    <a class="navbar-brand d-flex align-items-center" href="#home" onclick="event.preventDefault(); navigate('#home')">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/9/97/National_Fisheries_Research_and_Development_Institute_%28NFRDI%29.svg"
+        alt="NFRDI Logo" width="45" height="45" class="me-2 rounded-circle bg-white p-1"
+        title="National Fisheries Research and Development Institute">
+      <span class="fw-bold">FishCRRM 1.1</span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link px-3" href="#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="#structure">Implementation Structure</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="#fmaprofile">FMA Profile</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="#municipalities">Municipalities</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="#activities">Activities</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="#directory">Directory</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="#references">References</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="#about">About</a></li>
+      </ul>
+      <form class="d-flex" onsubmit="globalSearch(this.querySelector('input').value); return false;">
+        <div class="input-group">
+          <input class="form-control border-0 bg-white bg-opacity-10 text-white" type="search"
+            placeholder="Search..." id="global-search" style="backdrop-filter: blur(5px);">
+          <button class="btn btn-outline-light border-0" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</nav>

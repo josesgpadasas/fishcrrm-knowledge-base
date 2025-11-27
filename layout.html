@@ -1,0 +1,25 @@
+<!-- layout.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <base target="_blank">
+  <?!= include('styles') ?>
+</head>
+
+<body>
+  <?!= include('pagenavbar') ?>
+
+  <!-- Conditional padding: No padding on Home -->
+  <main class="container-fluid <? if (currentPage === 'index') { ?>pt-0<? } else { ?>py-4 py-md-5<? } ?>"
+    id="page-content" style="max-width: 95%;">
+    <?!= content ?>
+  </main>
+
+  <?!= include('pagefooter') ?>
+  <?!= include('pagetoast') ?>
+  <?!= include('scripts') ?>
+</body>
+
+</html>

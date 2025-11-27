@@ -1,0 +1,123 @@
+<!-- directory.html -->
+<div class="py-3 animate-fade-up">
+  <div class="d-flex align-items-center mb-4">
+    <div class="text-white rounded-circle p-3 me-3 shadow-sm" style="background: #151269;">
+      <i class="bi bi-person-lines-fill fs-3"></i>
+    </div>
+    <div>
+      <h2 class="fw-bold mb-0" style="color: #151269;">Directory</h2>
+      <p class="text-muted mb-0">Contact information for project personnel and partners</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="glass-panel p-4 shadow-sm">
+        <h4 class="fw-bold mb-4" style="color: #151269;">
+          <i class="bi bi-people me-2"></i>Contact Directory
+        </h4>
+        
+        <!-- Controls -->
+        <!-- First Row: Directory Type, Filters, and Export -->
+        <div class="row g-3 mb-3 align-items-end">
+          <div class="col-lg-3">
+            <label class="form-label fw-bold mb-2" style="color: #151269;">
+              <i class="bi bi-diagram-3 me-1"></i>Directory Type
+            </label>
+            <div class="btn-group w-100 shadow-sm rounded-pill overflow-hidden" role="group" id="dirTabs">
+              <button type="button" class="btn btn-light active fw-semibold" onclick="loadDirectory('internal')"
+                data-type="internal">
+                <i class="bi bi-building me-1"></i>Internal
+              </button>
+              <button type="button" class="btn btn-light fw-semibold" onclick="loadDirectory('external')"
+                data-type="external">
+                <i class="bi bi-people me-1"></i>External
+              </button>
+              <button type="button" class="btn btn-light fw-semibold" onclick="loadDirectory('npmo')" data-type="npmo">
+                <i class="bi bi-diagram-3 me-1"></i>NPMO
+              </button>
+            </div>
+          </div>
+          
+          <!-- Internal Filters: Component and Employment Type -->
+          <div class="col-lg-2 dir-filter-internal" style="display: none;">
+            <label class="form-label fw-bold mb-2" style="color: #151269;">
+              <i class="bi bi-funnel me-1"></i>Component
+            </label>
+            <select class="form-select shadow-sm" id="dir-filter-component">
+              <option value="">All Components</option>
+            </select>
+          </div>
+          <div class="col-lg-2 dir-filter-internal" style="display: none;">
+            <label class="form-label fw-bold mb-2" style="color: #151269;">
+              <i class="bi bi-funnel me-1"></i>Employment
+            </label>
+            <select class="form-select shadow-sm" id="dir-filter-employment">
+              <option value="">All Types</option>
+            </select>
+          </div>
+          
+          <!-- NPMO Filters: Office and Component -->
+          <div class="col-lg-2 dir-filter-npmo" style="display: none;">
+            <label class="form-label fw-bold mb-2" style="color: #151269;">
+              <i class="bi bi-funnel me-1"></i>Office
+            </label>
+            <select class="form-select shadow-sm" id="dir-filter-office">
+              <option value="">All Offices</option>
+            </select>
+          </div>
+          <div class="col-lg-2 dir-filter-npmo" style="display: none;">
+            <label class="form-label fw-bold mb-2" style="color: #151269;">
+              <i class="bi bi-funnel me-1"></i>Component
+            </label>
+            <select class="form-select shadow-sm" id="dir-filter-npmo-component">
+              <option value="">All Components</option>
+            </select>
+          </div>
+          
+          <div class="col-lg-2 ms-auto">
+            <label class="form-label fw-bold mb-2" style="color: #151269;">
+              <i class="bi bi-download me-1"></i>Export
+            </label>
+            <button class="btn w-100 shadow-sm text-white fw-semibold rounded-pill" id="export-csv" style="background: #0f1056; border: none; transition: all 0.3s ease;">
+              <i class="bi bi-download me-2"></i>Export CSV
+            </button>
+          </div>
+        </div>
+        
+        <!-- Second Row: Search spanning full width -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <label class="form-label fw-bold mb-2" style="color: #151269;">
+              <i class="bi bi-search me-1"></i>Search
+            </label>
+            <div class="input-group shadow-sm">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" class="form-control border-start-0 ps-0" id="dir-search"
+                placeholder="Search name or email...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive rounded-3 border shadow-sm">
+          <table class="table table-hover mb-0 align-middle" id="dir-table">
+            <thead style="background: #f8f9fa;">
+              <tr>
+                <!-- Headers injected by JS -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="5" class="text-center py-5">
+                  <div class="spinner-border" role="status" style="color: #151269;"></div>
+                  <p class="mt-2 text-muted">Loading directory...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

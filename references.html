@@ -1,0 +1,56 @@
+<!-- references.html -->
+<div class="py-3 animate-fade-up">
+  <div class="d-flex align-items-center mb-4">
+    <div class="text-white rounded-circle p-3 me-3 shadow-sm" style="background: #151269;">
+      <i class="bi bi-folder2-open fs-3"></i>
+    </div>
+    <div>
+      <h2 class="fw-bold mb-0" style="color: #151269;">References</h2>
+      <p class="text-muted mb-0">Downloadable documents and resources</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="glass-panel p-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+          <h4 class="fw-bold mb-0" style="color: #151269;">
+            <i class="bi bi-file-earmark-text me-2"></i>Reference Documents
+          </h4>
+          <div class="d-flex align-items-center gap-2">
+            <label class="form-label mb-0 fw-semibold small d-none d-sm-inline" style="color: #151269;">Items per page:</label>
+            <label class="form-label mb-0 fw-semibold small d-inline d-sm-none" style="color: #151269;">Per page:</label>
+            <select class="form-select form-select-sm" id="ref-items-per-page" style="width: auto; min-width: 80px;">
+              <option value="10">10</option>
+              <option value="20" selected>20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Filters will be injected here by JS -->
+        <div id="ref-filters-placeholder" class="mb-4"></div>
+
+        <div id="references-list" class="vstack gap-3">
+          <div class="text-center py-5">
+            <div class="spinner-border" role="status" style="color: #151269;"></div>
+            <p class="mt-2 text-muted">Loading files...</p>
+          </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="ref-pagination" class="d-none mt-4">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <span class="text-muted small" id="ref-pagination-info">Showing 0-0 of 0</span>
+            <nav>
+              <ul class="pagination pagination-sm mb-0" id="ref-pagination-controls">
+                <!-- Pagination buttons will be injected here -->
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

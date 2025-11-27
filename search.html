@@ -1,0 +1,106 @@
+<!-- search.html -->
+<div class="py-3 animate-fade-up">
+  <div class="d-flex align-items-center mb-4">
+    <div class="text-white rounded-circle p-3 me-3 shadow-sm" style="background: #151269;">
+      <i class="bi bi-search fs-3"></i>
+    </div>
+    <div>
+      <h2 class="fw-bold mb-0" style="color: #151269;">Search Results</h2>
+      <p class="text-muted mb-0" id="search-query">Enter a search term to find relevant pages.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="glass-panel p-4 shadow-sm">
+        <div id="search-results">
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-search display-6 d-block mb-3 opacity-50"></i>
+            <p class="mb-0">Start typing to search for pages and content.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="glass-panel p-4 shadow-sm mb-4">
+        <h5 class="fw-bold mb-4" style="color: #151269;">
+          <i class="bi bi-lightbulb me-2"></i>Quick Links
+        </h5>
+        <div class="vstack gap-3">
+          <a href="#structure" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+            <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-diagram-3"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold" style="color: #151269;">Implementation Structure</div>
+              <small class="text-muted">Organizational framework</small>
+            </div>
+            <i class="bi bi-arrow-right text-muted"></i>
+          </a>
+          <a href="#fmaprofile" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+            <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-bar-chart-line"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold" style="color: #151269;">FMA Profile</div>
+              <small class="text-muted">Characteristics & data</small>
+            </div>
+            <i class="bi bi-arrow-right text-muted"></i>
+          </a>
+          <a href="#municipalities" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+            <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-geo-alt"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold" style="color: #151269;">Municipalities</div>
+              <small class="text-muted">FMA 6 & 9 coverage</small>
+            </div>
+            <i class="bi bi-arrow-right text-muted"></i>
+          </a>
+          <a href="#activities" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+            <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-calendar-event"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold" style="color: #151269;">Activities</div>
+              <small class="text-muted">Timeline & events</small>
+            </div>
+            <i class="bi bi-arrow-right text-muted"></i>
+          </a>
+          <a href="#directory" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+            <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-people"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold" style="color: #151269;">Directory</div>
+              <small class="text-muted">Contact information</small>
+            </div>
+            <i class="bi bi-arrow-right text-muted"></i>
+          </a>
+          <a href="#references" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+            <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-file-earmark-text"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold" style="color: #151269;">References</div>
+              <small class="text-muted">Documents & files</small>
+            </div>
+            <i class="bi bi-arrow-right text-muted"></i>
+          </a>
+        </div>
+      </div>
+      <div class="glass-panel p-4 shadow-sm">
+        <h5 class="fw-bold mb-3" style="color: #151269;">
+          <i class="bi bi-clock-history me-2"></i>Recent Searches
+        </h5>
+        <div id="recent-searches">
+          <p class="text-muted small mb-0">No recent searches.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => loadSearchResults(location.hash));
+</script>

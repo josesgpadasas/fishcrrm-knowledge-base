@@ -1,0 +1,56 @@
+<!-- activities.html -->
+<div class="py-3 animate-fade-up">
+  <div class="d-flex align-items-center mb-5">
+    <div class="text-white rounded-circle p-3 me-3 shadow-sm" style="background: #151269;">
+      <i class="bi bi-calendar-event fs-3"></i>
+    </div>
+    <div>
+      <h2 class="fw-bold mb-0" style="color: #151269;">Activities Conducted</h2>
+      <p class="text-muted mb-0">Timeline of activities, trainings, and coordination meetings conducted</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="glass-panel p-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+          <h4 class="fw-bold mb-0" style="color: #151269;">
+            <i class="bi bi-clock-history me-2"></i>Timeline
+          </h4>
+          
+          <!-- Filters -->
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <!-- Search Filter -->
+            <div class="d-flex align-items-center">
+              <label class="form-label fw-bold me-2 mb-0 d-flex align-items-center" style="color: #151269;">
+                <i class="bi bi-search me-1"></i>Search:
+              </label>
+              <input type="text" id="filter-search" class="form-control shadow-sm" placeholder="Search activities..." style="min-width: 200px; border-color: #dee2e6;">
+            </div>
+            
+            <!-- Year Filter -->
+            <div class="d-flex align-items-center">
+              <label class="form-label fw-bold me-2 mb-0 d-flex align-items-center" style="color: #151269;">
+                <i class="bi bi-funnel me-1"></i>Year:
+              </label>
+              <select id="filter-year" class="form-select shadow-sm" style="min-width: 150px; border-color: #dee2e6;">
+                <option value="">All Years</option>
+                <option>Loading...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="position-relative">
+          <!-- Timeline Line is handled by CSS in styles.html -->
+          <div class="timeline" id="activities-timeline">
+            <div class="text-center py-5">
+              <div class="spinner-border" role="status" style="color: #151269;"></div>
+              <p class="mt-2 text-muted">Loading timeline...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
