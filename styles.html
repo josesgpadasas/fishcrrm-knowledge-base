@@ -44,6 +44,26 @@
     color: var(--text-main);
     overflow-x: hidden;
   }
+  
+  /* Allow horizontal scrolling on mobile/tablet for tables */
+  @media (max-width: 991.98px) {
+    body {
+      overflow-x: auto;
+    }
+    
+    /* Ensure container-fluid and row don't prevent overflow */
+    .container-fluid,
+    .row {
+      overflow-x: visible;
+      max-width: 100%;
+    }
+    
+    /* Ensure col-12 doesn't constrain width */
+    .col-12 {
+      overflow-x: visible;
+      max-width: 100%;
+    }
+  }
 
   /* === GLASSMORPHISM UTILITIES === */
   .glass-panel {
@@ -53,6 +73,13 @@
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
     border-radius: 16px;
+  }
+  
+  /* Allow overflow for glass-panel containing tables on mobile */
+  @media (max-width: 991.98px) {
+    .glass-panel {
+      overflow-x: visible;
+    }
   }
 
   .glass-card {
@@ -816,23 +843,60 @@
   }
   
   /* FMA Profile table responsive scrolling */
+  #fma-profile-container {
+    overflow-x: visible;
+    width: 100%;
+  }
+  
   #fma-profile-container .table-responsive {
-    overflow-x: auto;
+    overflow-x: auto !important;
     overflow-y: visible;
     -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+    max-width: 100%;
   }
   
   @media (max-width: 991.98px) {
+    /* Ensure parent containers allow overflow - use class-based approach */
+    body.fma-profile-page {
+      overflow-x: auto !important;
+    }
+    
+    body.fma-profile-page .container-fluid,
+    body.fma-profile-page .row,
+    body.fma-profile-page .col-12 {
+      overflow-x: visible !important;
+      max-width: 100% !important;
+    }
+    
+    /* Ensure parent containers allow overflow */
+    #fma-profile-container,
+    #fma-profile-container.parent {
+      overflow-x: visible !important;
+      max-width: 100% !important;
+    }
+    
+    /* Target parent glass-panel and col-12 */
+    .glass-panel #fma-profile-container,
+    .col-12 #fma-profile-container {
+      overflow-x: visible !important;
+    }
+    
     #fma-profile-container .table-responsive {
-      overflow-x: auto;
+      overflow-x: auto !important;
       overflow-y: visible;
       display: block;
       width: 100%;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
     }
     
     #fma-profile-container .table-responsive table {
-      min-width: 700px; /* Minimum width for FMA Profile table */
-      width: 100%;
+      min-width: 700px !important; /* Minimum width for FMA Profile table */
+      width: auto !important;
+      margin: 0;
     }
     
     #fma-profile-container table thead th,
@@ -851,7 +915,7 @@
   
   @media (max-width: 575.98px) {
     #fma-profile-container .table-responsive table {
-      min-width: 600px;
+      min-width: 600px !important;
     }
     
     #fma-profile-container table thead th,
