@@ -284,54 +284,883 @@ async function loadStructure() {
 
 async function loadMunicipalities() {
   const tbody = document.querySelector('#municipalities-table tbody');
-  if (!tbody) return;
+  const table = tbody ? tbody.closest('table') : null;
+  const filterPlaceholder = document.getElementById('filter-container-placeholder');
   
+  if (!tbody) {
+    console.error('Municipalities table tbody not found');
+    return;
+  }
+  
+  if (table) table.classList.add('table-loading');
+
   try {
+    console.log('Loading municipalities data...');
     const data = await dataService.getMunicipalities();
-    // ... rest of municipalities loading code
-    // (Full implementation would be here - see scripts.html for reference)
+    console.log('Municipalities data received:', data);
+    console.log('Data length:', data ? data.length : 0);
+    
+    if (!data || data.length === 0) {
+      console.warn('No municipalities data available');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="text-center text-muted py-5">
+            <i class="bi bi-inbox display-6 d-block mb-2 opacity-50"></i>
+            <p class="mb-0">No municipalities data available.</p>
+            <small class="text-muted">Please check that the FMA_6_&_9_Municipalities sheet exists and has data.</small>
+          </td>
+        </tr>
+      `;
+      if (table) table.classList.remove('table-loading');
+      return;
+    }
+    
+    // Log first row to see structure
+    console.log('First row sample:', data[0]);
+    console.log('Available keys in first row:', Object.keys(data[0] || {}));
+
+    // Helper function to get value from row with multiple possible column names
+    const getValue = (row, ...keys) => {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== null && row[key] !== '') {
+          return row[key];
+        }
+      }
+      return null;
+    };
+    
+    // Extract unique FMAs, regions & provinces
+    const fmas = [...new Set(data.map(r => getValue(r, 'FMA_ID', 'FMA ID', 'FMAID')).filter(Boolean))].sort();
+    const regions = [...new Set(data.map(r => getValue(r, 'REGION', 'Region')).filter(Boolean))].sort();
+    const provincesByRegion = {};
+    data.forEach(row => {
+      const region = getValue(row, 'REGION', 'Region');
+      const province = getValue(row, 'PROVINCE', 'Province');
+      if (region) {
+        if (!provincesByRegion[region]) provincesByRegion[region] = new Set();
+        if (province) provincesByRegion[region].add(province);
+      }
+    });
+    
+    console.log('Extracted filters:', { fmas, regions, provincesByRegion });
+
+    // Convert sets to sorted arrays
+    Object.keys(provincesByRegion).forEach(region => {
+      provincesByRegion[region] = [...provincesByRegion[region]].sort();
+    });
+
+    // Helper function to format FMA ID (avoid duplicate "FMA" prefix)
+    const formatFMA = (fmaId) => {
+      if (!fmaId) return '-';
+      // If FMA_ID already starts with "FMA", return as-is, otherwise add "FMA " prefix
+      return fmaId.toUpperCase().startsWith('FMA') ? fmaId : `FMA ${fmaId}`;
+    };
+
+    // === FILTER CONTROLS ===
+    const filterHTML = `
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label class="form-label fw-bold" style="color: #151269;">
+            <i class="bi bi-diagram-3 me-1"></i>Filter by FMA
+          </label>
+          <select id="filter-fma" class="form-select shadow-sm">
+            <option value="">All FMAs</option>
+            ${fmas.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(formatFMA(f))}</option>`).join('')}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold" style="color: #151269;">
+            <i class="bi bi-geo-alt-fill me-1"></i>Filter by Region
+          </label>
+          <select id="filter-region" class="form-select shadow-sm">
+            <option value="">All Regions</option>
+            ${regions.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold" style="color: #151269;">
+            <i class="bi bi-building me-1"></i>Filter by Province
+          </label>
+          <select id="filter-province" class="form-select shadow-sm" disabled>
+            <option value="">All Provinces (select region first)</option>
+          </select>
+        </div>
+      </div>
+    `;
+
+    // Insert filters in placeholder
+    if (filterPlaceholder) {
+      filterPlaceholder.innerHTML = filterHTML;
+    }
+
+    const fmaSelect = document.getElementById('filter-fma');
+    const regionSelect = document.getElementById('filter-region');
+    const provinceSelect = document.getElementById('filter-province');
+
+    // Populate provinces when region changes
+    if (regionSelect) {
+      regionSelect.addEventListener('change', () => {
+        const selectedRegion = regionSelect.value;
+        if (provinceSelect) {
+          provinceSelect.innerHTML = '<option value="">All Provinces</option>';
+          provinceSelect.disabled = !selectedRegion;
+
+          if (selectedRegion && provincesByRegion[selectedRegion]) {
+            provincesByRegion[selectedRegion].forEach(prov => {
+              const opt = document.createElement('option');
+              opt.value = prov;
+              opt.textContent = prov;
+              provinceSelect.appendChild(opt);
+            });
+          }
+        }
+        renderTable();
+      });
+    }
+
+    if (provinceSelect) {
+      provinceSelect.addEventListener('change', renderTable);
+    }
+
+    if (fmaSelect) {
+      fmaSelect.addEventListener('change', renderTable);
+    }
+
+    // === RENDER FUNCTION ===
+    function renderTable() {
+      const fma = fmaSelect?.value || '';
+      const region = regionSelect?.value || '';
+      const province = provinceSelect?.value || '';
+
+      let filtered = data;
+      if (fma) filtered = filtered.filter(r => {
+        const rowFma = getValue(r, 'FMA_ID', 'FMA ID', 'FMAID');
+        return rowFma === fma;
+      });
+      if (region) filtered = filtered.filter(r => {
+        const rowRegion = getValue(r, 'REGION', 'Region');
+        return rowRegion === region;
+      });
+      if (province) filtered = filtered.filter(r => {
+        const rowProvince = getValue(r, 'PROVINCE', 'Province');
+        return rowProvince === province;
+      });
+
+      console.log(`Rendering ${filtered.length} municipalities (filtered from ${data.length})`);
+
+      tbody.innerHTML = filtered.length ? filtered.map(row => {
+        const fmaId = getValue(row, 'FMA_ID', 'FMA ID', 'FMAID');
+        const region = getValue(row, 'REGION', 'Region');
+        const province = getValue(row, 'PROVINCE', 'Province');
+        const municipality = getValue(row, 'MUNICIPALITY', 'Municipality');
+        
+        return `
+        <tr style="transition: background-color 0.2s ease;">
+          <td class="ps-4">
+            <span class="badge rounded-pill px-3 py-2 text-white fw-semibold" style="background: #0f1056;">
+              ${escapeHtml(formatFMA(fmaId))}
+            </span>
+          </td>
+          <td>${escapeHtml(region || '-')}</td>
+          <td>${escapeHtml(province || '-')}</td>
+          <td class="pe-4 fw-semibold">${escapeHtml(municipality || '-')}</td>
+        </tr>
+      `;
+      }).join('') : `
+        <tr>
+          <td colspan="4" class="text-center text-muted py-5">
+            <i class="bi bi-inbox display-6 d-block mb-2 opacity-50"></i>
+            <p class="mb-0">No municipalities match your filters</p>
+          </td>
+        </tr>
+      `;
+    }
+
+    // Initial render
+    renderTable();
+
   } catch (err) {
     console.error('Load municipalities error:', err);
+    console.error('Error stack:', err.stack);
+    const errorMessage = err.message || 'Unknown error';
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-danger text-center py-4">
+          <i class="bi bi-exclamation-triangle display-6 d-block mb-2"></i>
+          <p class="mb-0">Failed to load municipalities data.</p>
+          <small class="text-muted d-block mt-2">Error: ${escapeHtml(errorMessage)}</small>
+          <small class="text-muted">Check the browser console (F12) for more details.</small>
+        </td>
+      </tr>
+    `;
+  } finally {
+    if (table) table.classList.remove('table-loading');
   }
 }
 
 async function loadActivities() {
   const timeline = document.getElementById('activities-timeline');
+  const yearSel = document.getElementById('filter-year');
+  const searchInput = document.getElementById('filter-search');
+
   if (!timeline) return;
-  
+
   try {
     const data = await dataService.getActivities();
-    // ... rest of activities loading code
-    // (Full implementation would be here - see scripts.html for reference)
+
+    // Populate Year filter only
+    const years = [...new Set(data.map(a => new Date(a.DATE_CONDUCTED).getFullYear()))].sort((a, b) => b - a);
+    if (yearSel) {
+      yearSel.innerHTML = '<option value="">All Years</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
+    }
+
+    const render = () => {
+      let filtered = data;
+      
+      // Apply year filter
+      if (yearSel && yearSel.value) {
+        filtered = filtered.filter(a => new Date(a.DATE_CONDUCTED).getFullYear() == yearSel.value);
+      }
+      
+      // Apply search filter
+      if (searchInput && searchInput.value.trim()) {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        filtered = filtered.filter(a => {
+          const title = (a.ACTIVITY_TITLE || '').toLowerCase();
+          const location = (a.LOCATION || '').toLowerCase();
+          const resourcePerson = (a.RESOURCE_PERSON || '').toLowerCase();
+          return title.includes(searchTerm) || location.includes(searchTerm) || resourcePerson.includes(searchTerm);
+        });
+      }
+      
+      filtered.sort((a, b) => new Date(b.DATE_CONDUCTED) - new Date(a.DATE_CONDUCTED));
+
+      // ADD THIS LINE: Reset animation
+      timeline.classList.add('timeline-reset');
+
+      // Force reflow to restart animation
+      void timeline.offsetWidth;
+
+      timeline.innerHTML = filtered.length ? filtered.map((a, idx) => `
+        <div class="timeline-item ${idx < filtered.length - 1 ? 'mb-5' : ''}">
+          <div class="card border-0 shadow-lg rounded-4 overflow-hidden transition-all hover-lift" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+            <!-- Header Bar -->
+            <div class="card-header border-0 p-0" style="background: #151269; height: 4px;"></div>
+            
+            <div class="card-body p-4">
+              <!-- Date Badge -->
+              <div class="mb-3">
+                <span class="badge rounded-pill px-3 py-2 text-white" style="background: #151269; font-weight: 600;">
+                  <i class="bi bi-calendar3-event me-1"></i>
+                  ${formatDate(a.DATE_CONDUCTED)}
+                </span>
+              </div>
+
+              <!-- Activity Title -->
+              <div class="mb-4">
+                <label class="small text-muted fw-semibold text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Activity Title</label>
+                <h5 class="card-title fw-bold text-dark mb-0" style="font-size: 1.25rem; line-height: 1.4; color: #151269;">
+                  ${escapeHtml(a.ACTIVITY_TITLE || 'Untitled Activity')}
+                </h5>
+              </div>
+
+              <!-- Details Section -->
+              <div class="row g-3 mb-3">
+                <!-- Location -->
+                <div class="col-md-6">
+                  <label class="small text-muted fw-semibold text-uppercase mb-1 d-flex align-items-center" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                    <i class="bi bi-geo-alt-fill me-1" style="color: #151269;"></i>
+                    Location
+                  </label>
+                  <div class="text-dark fw-semibold">
+                    ${escapeHtml(a.LOCATION || 'Not specified')}
+                  </div>
+                </div>
+
+                <!-- Resource Person -->
+                <div class="col-md-6">
+                  <label class="small text-muted fw-semibold text-uppercase mb-1 d-flex align-items-center" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                    <i class="bi bi-person-circle me-1" style="color: #151269;"></i>
+                    Resource Person
+                  </label>
+                  <div class="text-dark fw-semibold">
+                    ${escapeHtml(a.RESOURCE_PERSON || 'Not specified')}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reference Document Button -->
+              ${a.REFERENCE_DOC ? `
+                <div class="pt-3 border-top mt-3">
+                  <a href="${escapeHtml(a.REFERENCE_DOC)}" 
+                     target="_blank" 
+                     class="btn btn-sm w-100 rounded-pill fw-semibold d-flex align-items-center justify-content-center gap-2 text-white"
+                     style="background: #0f1056; border: none; padding: 0.5rem 1rem;">
+                    <i class="bi bi-file-earmark-text"></i>
+                    View Reference Document
+                  </a>
+                </div>
+              ` : `
+                <div class="pt-3 border-top mt-3">
+                  <span class="text-muted small d-flex align-items-center justify-content-center">
+                    <i class="bi bi-info-circle me-1"></i>
+                    No reference document available
+                  </span>
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+      `).join('') : `
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-inbox display-1"></i>
+          <p class="mt-3">No activities found.</p>
+        </div>
+      `;
+
+      // REMOVE reset class after render
+      setTimeout(() => timeline.classList.remove('timeline-reset'), 50);
+    };
+
+    if (yearSel) {
+      yearSel.onchange = render;
+    }
+    if (searchInput) {
+      searchInput.oninput = () => debounce(render, 300)();
+    }
+    render();
   } catch (err) {
     console.error('Load activities error:', err);
+    timeline.innerHTML = `
+      <div class="alert alert-danger rounded-3">
+        <i class="bi bi-exclamation-triangle"></i> Failed to load activities.
+      </div>
+    `;
   }
 }
 
 async function loadDirectory(type) {
   currentDirType = type;
   const table = document.getElementById('dir-table');
-  if (!table) return;
+  const thead = table ? table.querySelector('thead') : null;
+  const tbody = table ? table.querySelector('tbody') : null;
+  const searchInput = document.getElementById('dir-search');
+  const exportBtn = document.getElementById('export-csv');
+
+  if (!table || !thead || !tbody) return;
+
+  // Show loading state immediately
+  table.classList.add('table-loading');
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="text-center py-5">
+        <div class="spinner-border" role="status" style="color: #151269;"></div>
+        <p class="mt-2 text-muted">Loading ${type.charAt(0).toUpperCase() + type.slice(1)} directory...</p>
+      </td>
+    </tr>
+  `;
   
+  // Clear search input and reset filters
+  if (searchInput) searchInput.value = '';
+  
+  // Reset all filter dropdowns
+  const componentFilter = document.getElementById('dir-filter-component');
+  const employmentFilter = document.getElementById('dir-filter-employment');
+  const officeFilter = document.getElementById('dir-filter-office');
+  const npmoComponentFilter = document.getElementById('dir-filter-npmo-component');
+  
+  if (componentFilter) componentFilter.value = '';
+  if (employmentFilter) employmentFilter.value = '';
+  if (officeFilter) officeFilter.value = '';
+  if (npmoComponentFilter) npmoComponentFilter.value = '';
+  
+  // Update active tab button (no spinner, just update active state)
+  document.querySelectorAll('#dirTabs button').forEach(btn => {
+    const isActive = btn.dataset.type === type;
+    btn.classList.toggle('active', isActive);
+  });
+
   try {
     const data = await dataService.getDirectory(type);
-    // ... rest of directory loading code
-    // (Full implementation would be here - see scripts.html for reference)
+
+    // Build full name for all types
+    data.forEach(r => {
+      r.fullName = `${r.GIVEN_NAME || ''} ${r.MIDDLE_INITIAL ? r.MIDDLE_INITIAL + '. ' : ''}${r.LAST_NAME || ''}`.trim();
+    });
+
+    // === CONFIG PER TYPE ===
+    let config;
+    if (type === 'internal') {
+      config = {
+        headers: ['Name', 'Component', 'Position', 'Employment', 'Email'],
+        keys: ['fullName', 'COMPONENT', 'POSITION_DESIGNATION', 'EMPLOYMENT_TYPE', 'EMAIL']
+      };
+    } else if (type === 'external') {
+      config = {
+        headers: ['Name', 'Office', 'Position', 'FMA Lead', 'Email'],
+        keys: ['fullName', 'OFFICE', 'POSITION_DESIGNATION', 'FMA_LEAD', 'EMAIL']
+      };
+    } else if (type === 'npmo') {
+      config = {
+        headers: ['Name', 'Office', 'Position', 'Component', 'Email'],
+        keys: ['fullName', 'OFFICE', 'POSITION_DESIGNATION', 'COMPONENT', 'EMAIL']
+      };
+    } else {
+      throw new Error('Invalid directory type');
+    }
+
+    const { headers, keys } = config;
+
+    // Update table header
+    thead.innerHTML = `<tr>${headers.map(h => `<th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem;">${h}</th>`).join('')}</tr>`;
+
+    // Hide/show filters based on type
+    document.querySelectorAll('.dir-filter-internal, .dir-filter-npmo').forEach(el => el.style.display = 'none');
+    
+    let componentFilter, employmentFilter, officeFilter, npmoComponentFilter;
+    
+    if (type === 'internal') {
+      // Show Internal filters
+      document.querySelectorAll('.dir-filter-internal').forEach(el => el.style.display = 'block');
+      componentFilter = document.getElementById('dir-filter-component');
+      employmentFilter = document.getElementById('dir-filter-employment');
+      
+      // Populate Component filter
+      const components = [...new Set(data.map(r => r.COMPONENT).filter(Boolean))].sort();
+      if (componentFilter) {
+        componentFilter.innerHTML = '<option value="">All Components</option>' +
+          components.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      }
+      
+      // Populate Employment Type filter
+      const employmentTypes = [...new Set(data.map(r => r.EMPLOYMENT_TYPE).filter(Boolean))].sort();
+      if (employmentFilter) {
+        employmentFilter.innerHTML = '<option value="">All Types</option>' +
+          employmentTypes.map(e => `<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join('');
+      }
+    } else if (type === 'external') {
+      // Hide all filters for External (only search remains)
+      // Filters are already hidden above
+    } else if (type === 'npmo') {
+      // Show NPMO filters
+      document.querySelectorAll('.dir-filter-npmo').forEach(el => el.style.display = 'block');
+      officeFilter = document.getElementById('dir-filter-office');
+      npmoComponentFilter = document.getElementById('dir-filter-npmo-component');
+      
+      // Populate Office filter
+      const offices = [...new Set(data.map(r => r.OFFICE).filter(Boolean))].sort();
+      if (officeFilter) {
+        officeFilter.innerHTML = '<option value="">All Offices</option>' +
+          offices.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+      }
+      
+      // Populate Component filter
+      const components = [...new Set(data.map(r => r.COMPONENT).filter(Boolean))].sort();
+      if (npmoComponentFilter) {
+        npmoComponentFilter.innerHTML = '<option value="">All Components</option>' +
+          components.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      }
+    }
+
+    // Render function
+    const render = () => {
+      let filtered = data;
+      const query = searchInput ? searchInput.value.toLowerCase() : '';
+
+      // Apply search filter
+      if (query) {
+        filtered = filtered.filter(r =>
+          r.fullName.toLowerCase().includes(query) ||
+          (r.EMAIL && r.EMAIL.toLowerCase().includes(query))
+        );
+      }
+      
+      // Apply type-specific filters
+      if (type === 'internal') {
+        const selectedComponent = componentFilter?.value || '';
+        const selectedEmployment = employmentFilter?.value || '';
+        
+        if (selectedComponent) {
+          filtered = filtered.filter(r => r.COMPONENT === selectedComponent);
+        }
+        if (selectedEmployment) {
+          filtered = filtered.filter(r => r.EMPLOYMENT_TYPE === selectedEmployment);
+        }
+      } else if (type === 'npmo') {
+        const selectedOffice = officeFilter?.value || '';
+        const selectedComponent = npmoComponentFilter?.value || '';
+        
+        if (selectedOffice) {
+          filtered = filtered.filter(r => r.OFFICE === selectedOffice);
+        }
+        if (selectedComponent) {
+          filtered = filtered.filter(r => r.COMPONENT === selectedComponent);
+        }
+      }
+
+      tbody.innerHTML = filtered.length ? filtered.map(r => `
+        <tr>
+          <td>${escapeHtml(r.fullName)}</td>
+          <td>${escapeHtml(r[keys[1]] || '-')}</td>
+          <td>${escapeHtml(r[keys[2]] || '-')}</td>
+          <td>${escapeHtml(r[keys[3]] || '-')}</td>
+          <td>${r.EMAIL ? `<a href="mailto:${r.EMAIL}" class="text-primary">${escapeHtml(r.EMAIL)}</a>` : '-'}</td>
+        </tr>
+      `).join('') : `
+        <tr>
+          <td colspan="5" class="text-center text-muted py-4">No contacts found</td>
+        </tr>
+      `;
+    };
+
+    // Bind events
+    if (searchInput) {
+      searchInput.oninput = () => debounce(render, 300)();
+    }
+    
+    if (componentFilter) componentFilter.onchange = render;
+    if (employmentFilter) employmentFilter.onchange = render;
+    if (officeFilter) officeFilter.onchange = render;
+    if (npmoComponentFilter) npmoComponentFilter.onchange = render;
+
+    // Export CSV
+    if (exportBtn) {
+      exportBtn.onclick = async () => {
+        let filtered = data;
+        const query = searchInput ? searchInput.value.toLowerCase() : '';
+        
+        // Apply same filters as render function
+        if (query) {
+          filtered = filtered.filter(r =>
+            r.fullName.toLowerCase().includes(query) ||
+            (r.EMAIL && r.EMAIL.toLowerCase().includes(query))
+          );
+        }
+        
+        if (type === 'internal') {
+          const selectedComponent = componentFilter?.value || '';
+          const selectedEmployment = employmentFilter?.value || '';
+          if (selectedComponent) filtered = filtered.filter(r => r.COMPONENT === selectedComponent);
+          if (selectedEmployment) filtered = filtered.filter(r => r.EMPLOYMENT_TYPE === selectedEmployment);
+        } else if (type === 'npmo') {
+          const selectedOffice = officeFilter?.value || '';
+          const selectedComponent = npmoComponentFilter?.value || '';
+          if (selectedOffice) filtered = filtered.filter(r => r.OFFICE === selectedOffice);
+          if (selectedComponent) filtered = filtered.filter(r => r.COMPONENT === selectedComponent);
+        }
+        
+        const csv = dataService.exportDirectoryToCSV(filtered);
+        if (csv) {
+          const a = document.createElement('a');
+          a.href = csv;
+          a.download = `${type}_directory_${new Date().toISOString().slice(0, 10)}.csv`;
+          a.click();
+          showToast('Directory exported as CSV!', 'success');
+        }
+      };
+    }
+
+    // Initial render
+    render();
+
   } catch (err) {
     console.error('Load directory error:', err);
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-danger text-center py-4">
+          Failed to load directory. Please try again.
+        </td>
+      </tr>
+    `;
+  } finally {
+    table.classList.remove('table-loading');
+    
+    // === UPDATE ACTIVE TAB ===
+    document.querySelectorAll('#dirTabs button').forEach(btn => {
+      const isActive = btn.dataset.type === type;
+      btn.classList.toggle('active', isActive);
+    });
   }
 }
 
 async function loadReferences() {
   const container = document.getElementById('references-list');
+  const filtersPlaceholder = document.getElementById('ref-filters-placeholder');
+  const paginationEl = document.getElementById('ref-pagination');
+  const paginationControls = document.getElementById('ref-pagination-controls');
+  const paginationInfo = document.getElementById('ref-pagination-info');
+  const itemsPerPageSelect = document.getElementById('ref-items-per-page');
+  
   if (!container) return;
+  
+  // Pagination state
+  let currentPage = 1;
+  let itemsPerPage = 20;
   
   try {
     const data = await dataService.getReferenceFiles();
-    // ... rest of references loading code
-    // (Full implementation would be here - see scripts.html for reference)
+    
+    // Extract unique categories
+    const categories = [...new Set(data.map(r => r.CATEGORY || r.Category || '').filter(Boolean))].sort();
+    
+    // Create filters HTML
+    const filtersHTML = `
+      <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+          <label class="form-label fw-bold mb-2" style="color: #151269;">
+            <i class="bi bi-search me-1"></i>Search
+          </label>
+          <div class="input-group shadow-sm">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" class="form-control border-start-0 ps-0" id="ref-search" placeholder="Search files...">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-bold mb-2" style="color: #151269;">
+            <i class="bi bi-funnel me-1"></i>Category
+          </label>
+          <select class="form-select shadow-sm" id="ref-filter-category">
+            <option value="">All Categories</option>
+            ${categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    `;
+    
+    // Insert filters
+    if (filtersPlaceholder) {
+      filtersPlaceholder.innerHTML = filtersHTML;
+    }
+    
+    const search = document.getElementById('ref-search');
+    const categoryFilter = document.getElementById('ref-filter-category');
+    
+    // Function to render pagination controls
+    const renderPagination = (totalItems, currentPageNum, itemsPerPageNum) => {
+      const totalPages = Math.ceil(totalItems / itemsPerPageNum);
+      
+      if (totalPages <= 1) {
+        if (paginationEl) paginationEl.classList.add('d-none');
+        return;
+      }
+      
+      if (paginationEl) paginationEl.classList.remove('d-none');
+      
+      // Update pagination info
+      const start = totalItems === 0 ? 0 : (currentPageNum - 1) * itemsPerPageNum + 1;
+      const end = Math.min(currentPageNum * itemsPerPageNum, totalItems);
+      if (paginationInfo) {
+        paginationInfo.textContent = `Showing ${start}-${end} of ${totalItems}`;
+      }
+      
+      // Build pagination buttons
+      let paginationHTML = '';
+      
+      // Previous button
+      paginationHTML += `
+        <li class="page-item ${currentPageNum === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="javascript:void(0)" data-page="${currentPageNum - 1}" style="color: #151269;">
+            <i class="bi bi-chevron-left"></i>
+          </a>
+        </li>
+      `;
+      
+      // Page number buttons
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPageNum - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      
+      if (startPage > 1) {
+        paginationHTML += `
+          <li class="page-item">
+            <a class="page-link" href="javascript:void(0)" data-page="1" style="color: #151269;">1</a>
+          </li>
+        `;
+        if (startPage > 2) {
+          paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+          <li class="page-item ${i === currentPageNum ? 'active' : ''}">
+            <a class="page-link" href="javascript:void(0)" data-page="${i}" 
+               style="${i === currentPageNum ? 'background: #151269; border-color: #151269; color: white;' : 'color: #151269;'}">
+              ${i}
+            </a>
+          </li>
+        `;
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        paginationHTML += `
+          <li class="page-item">
+            <a class="page-link" href="javascript:void(0)" data-page="${totalPages}" style="color: #151269;">${totalPages}</a>
+          </li>
+        `;
+      }
+      
+      // Next button
+      paginationHTML += `
+        <li class="page-item ${currentPageNum === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="javascript:void(0)" data-page="${currentPageNum + 1}" style="color: #151269;">
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </li>
+      `;
+      
+      if (paginationControls) {
+        paginationControls.innerHTML = paginationHTML;
+      }
+    };
+    
+    // Function to go to a specific page
+    const goToPage = (pageNum) => {
+      const totalPages = Math.ceil(getFilteredData().length / itemsPerPage);
+      if (pageNum >= 1 && pageNum <= totalPages) {
+        currentPage = pageNum;
+        render();
+      }
+    };
+    
+    // Function to get filtered data
+    const getFilteredData = () => {
+      const q = search?.value.toLowerCase() || '';
+      const selectedCategory = categoryFilter?.value || '';
+      
+      let filtered = data;
+      
+      // Apply search filter
+      if (q) {
+        filtered = filtered.filter(r => r.DOCUMENT_TITLE.toLowerCase().includes(q));
+      }
+      
+      // Apply category filter
+      if (selectedCategory) {
+        filtered = filtered.filter(r => (r.CATEGORY || r.Category || '') === selectedCategory);
+      }
+      
+      // Sort alphabetically by document title
+      filtered.sort((a, b) => {
+        const titleA = (a.DOCUMENT_TITLE || '').toLowerCase();
+        const titleB = (b.DOCUMENT_TITLE || '').toLowerCase();
+        return titleA.localeCompare(titleB);
+      });
+      
+      return filtered;
+    };
+    
+    const render = () => {
+      const filtered = getFilteredData();
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      
+      // Reset to page 1 if current page is out of bounds
+      if (currentPage > totalPages && totalPages > 0) {
+        currentPage = 1;
+      }
+      
+      // Get paginated data
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedData = filtered.slice(startIndex, endIndex);
+      
+      // Render items
+      container.innerHTML = paginatedData.length ? paginatedData.map(r => {
+        const category = r.CATEGORY || r.Category || 'Uncategorized';
+        return `
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden transition-all hover-lift" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+          <!-- Header Bar -->
+          <div class="card-header border-0 p-0" style="background: #151269; height: 4px;"></div>
+          
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="flex-grow-1 me-3">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="rounded-circle p-2 me-3 flex-shrink-0" style="background: rgba(21, 18, 105, 0.1);">
+                    <i class="bi bi-file-earmark-pdf fs-5" style="color: #151269;"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="card-title mb-1 fw-bold" style="color: #151269; font-size: 1.1rem;">${escapeHtml(r.DOCUMENT_TITLE)}</h6>
+                    <span class="badge rounded-pill px-3 py-1 text-white" style="background: #0f1056; font-size: 0.75rem; font-weight: 600;">
+                      <i class="bi bi-tag me-1"></i>${escapeHtml(category)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <a href="${r.FILE_URL}" 
+                 class="btn btn-sm rounded-pill fw-semibold d-flex align-items-center gap-2 text-white flex-shrink-0" 
+                 style="background: #0f1056; border: none; padding: 0.5rem 1.5rem; transition: all 0.3s ease;"
+                 target="_blank">
+                <i class="bi bi-box-arrow-up-right"></i>
+                Open Document
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('') : `
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-inbox display-6 d-block mb-2 opacity-50"></i>
+          <p class="mb-0">No files found.</p>
+        </div>
+      `;
+      
+      // Render pagination
+      renderPagination(totalItems, currentPage, itemsPerPage);
+    };
+    
+    // Event handlers
+    if (search) {
+      search.oninput = () => {
+        currentPage = 1; // Reset to first page on search
+        debounce(render, 300)();
+      };
+    }
+    
+    if (categoryFilter) {
+      categoryFilter.onchange = () => {
+        currentPage = 1; // Reset to first page on filter change
+        render();
+      };
+    }
+    
+    if (itemsPerPageSelect) {
+      itemsPerPageSelect.onchange = () => {
+        itemsPerPage = parseInt(itemsPerPageSelect.value) || 20;
+        currentPage = 1; // Reset to first page when changing items per page
+        render();
+      };
+    }
+    
+    // Use event delegation for pagination buttons
+    if (paginationControls) {
+      paginationControls.addEventListener('click', (e) => {
+        const link = e.target.closest('.page-link[data-page]');
+        if (link && !link.closest('.disabled')) {
+          e.preventDefault();
+          e.stopPropagation();
+          const pageNum = parseInt(link.getAttribute('data-page'));
+          if (!isNaN(pageNum)) {
+            goToPage(pageNum);
+          }
+          return false;
+        }
+      });
+    }
+    
+    render();
   } catch (err) {
     console.error('Load references error:', err);
+    if (container) container.innerHTML = '<p class="text-danger">Failed to load files.</p>';
+    if (paginationEl) paginationEl.classList.add('d-none');
   }
 }
 
