@@ -584,47 +584,47 @@ async function loadActivities() {
 
       timeline.innerHTML = filtered.length ? filtered.map((a, idx) => `
         <div class="timeline-item ${idx < filtered.length - 1 ? 'mb-5' : ''}">
-          <div class="card border-0 shadow-lg rounded-4 overflow-hidden transition-all hover-lift" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+          <div class="card border-0 shadow-lg rounded-4 overflow-hidden transition-all hover-lift activity-timeline-card" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
             <!-- Header Bar -->
             <div class="card-header border-0 p-0" style="background: #151269; height: 4px;"></div>
             
-            <div class="card-body p-4">
+            <div class="card-body activity-card-body">
               <!-- Date Badge -->
               <div class="mb-3">
-                <span class="badge rounded-pill px-3 py-2 text-white" style="background: #151269; font-weight: 600;">
+                <span class="badge rounded-pill activity-date-badge text-white" style="background: #151269; font-weight: 600;">
                   <i class="bi bi-calendar3-event me-1"></i>
                   ${formatDate(a.DATE_CONDUCTED)}
                 </span>
               </div>
 
               <!-- Activity Title -->
-              <div class="mb-4">
-                <label class="small text-muted fw-semibold text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Activity Title</label>
-                <h5 class="card-title fw-bold text-dark mb-0" style="font-size: 1.25rem; line-height: 1.4; color: #151269;">
+              <div class="mb-4 activity-title-section">
+                <label class="small text-muted fw-semibold text-uppercase mb-1 activity-label">Activity Title</label>
+                <h5 class="card-title fw-bold text-dark mb-0 activity-title" style="color: #151269;">
                   ${escapeHtml(a.ACTIVITY_TITLE || 'Untitled Activity')}
                 </h5>
               </div>
 
               <!-- Details Section -->
-              <div class="row g-3 mb-3">
+              <div class="row g-3 mb-3 activity-details">
                 <!-- Location -->
-                <div class="col-md-6">
-                  <label class="small text-muted fw-semibold text-uppercase mb-1 d-flex align-items-center" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                <div class="col-12 col-md-6">
+                  <label class="small text-muted fw-semibold text-uppercase mb-1 d-flex align-items-center activity-detail-label">
                     <i class="bi bi-geo-alt-fill me-1" style="color: #151269;"></i>
                     Location
                   </label>
-                  <div class="text-dark fw-semibold">
+                  <div class="text-dark fw-semibold activity-detail-value">
                     ${escapeHtml(a.LOCATION || 'Not specified')}
                   </div>
                 </div>
 
                 <!-- Resource Person -->
-                <div class="col-md-6">
-                  <label class="small text-muted fw-semibold text-uppercase mb-1 d-flex align-items-center" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                <div class="col-12 col-md-6">
+                  <label class="small text-muted fw-semibold text-uppercase mb-1 d-flex align-items-center activity-detail-label">
                     <i class="bi bi-person-circle me-1" style="color: #151269;"></i>
                     Resource Person
                   </label>
-                  <div class="text-dark fw-semibold">
+                  <div class="text-dark fw-semibold activity-detail-value">
                     ${escapeHtml(a.RESOURCE_PERSON || 'Not specified')}
                   </div>
                 </div>
@@ -632,17 +632,17 @@ async function loadActivities() {
 
               <!-- Reference Document Button -->
               ${a.REFERENCE_DOC ? `
-                <div class="pt-3 border-top mt-3">
+                <div class="pt-3 border-top mt-3 activity-reference-section">
                   <a href="${escapeHtml(a.REFERENCE_DOC)}" 
                      target="_blank" 
-                     class="btn btn-sm w-100 rounded-pill fw-semibold d-flex align-items-center justify-content-center gap-2 text-white"
-                     style="background: #0f1056; border: none; padding: 0.5rem 1rem;">
+                     class="btn btn-sm w-100 rounded-pill fw-semibold d-flex align-items-center justify-content-center gap-2 text-white activity-reference-btn"
+                     style="background: #0f1056; border: none;">
                     <i class="bi bi-file-earmark-text"></i>
                     View Reference Document
                   </a>
                 </div>
               ` : `
-                <div class="pt-3 border-top mt-3">
+                <div class="pt-3 border-top mt-3 activity-reference-section">
                   <span class="text-muted small d-flex align-items-center justify-content-center">
                     <i class="bi bi-info-circle me-1"></i>
                     No reference document available
