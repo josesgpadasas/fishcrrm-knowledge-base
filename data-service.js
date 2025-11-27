@@ -28,19 +28,29 @@ class DataService {
   async fetchSheetData(sheetName) {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.config.SPREADSHEET_ID}/values/${encodeURIComponent(sheetName)}?key=${this.config.API_KEY}`;
     
+    console.log(`Fetching sheet: ${sheetName} from URL: ${url.replace(this.config.API_KEY, 'API_KEY_HIDDEN')}`);
+    
     try {
       const response = await fetch(url);
+      
       if (!response.ok) {
-        throw new Error(`Failed to fetch ${sheetName}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(`API Error for ${sheetName}:`, response.status, response.statusText, errorText);
+        throw new Error(`Failed to fetch ${sheetName}: ${response.status} ${response.statusText}`);
       }
+      
       const data = await response.json();
+      console.log(`Received data for ${sheetName}:`, data);
       
       if (!data.values || data.values.length === 0) {
+        console.warn(`No data values found in ${sheetName}`);
         return [];
       }
 
       // Convert rows to objects
       const headers = data.values[0].map(h => h.trim());
+      console.log(`Headers for ${sheetName}:`, headers);
+      
       const rows = data.values.slice(1).map(row => {
         const obj = {};
         headers.forEach((header, i) => {
@@ -49,6 +59,7 @@ class DataService {
         return obj;
       });
 
+      console.log(`Converted ${rows.length} rows for ${sheetName}`);
       return rows;
     } catch (error) {
       console.error(`Error fetching ${sheetName}:`, error);
