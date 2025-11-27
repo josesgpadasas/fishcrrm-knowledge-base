@@ -1306,18 +1306,18 @@ async function loadFMAProfile() {
 
     console.log(`Generating table with ${tableRows.length} rows`);
     container.innerHTML = `
-      <div class="table-responsive rounded-3 border shadow-sm" style="overflow-x: auto !important; overflow-y: visible; -webkit-overflow-scrolling: touch; display: block; width: 100%; max-width: 100%;">
-        <table class="table table-hover mb-0 align-middle" style="min-width: 700px; width: auto; margin: 0;">
+      <div class="table-responsive fma-profile-table-wrapper rounded-3 border shadow-sm">
+        <table class="table table-hover mb-0 align-middle fma-profile-table">
           <thead style="background: #f8f9fa;">
             <tr>
-              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 30%; text-align: left;">Key Characteristics</th>
-              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 20%; text-align: left;">Measurement</th>
-              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 25%; text-align: left;">
+              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; text-align: left;">Key Characteristics</th>
+              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; text-align: left;">Measurement</th>
+              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; text-align: left;">
                 <span class="badge rounded-pill px-3 py-2 text-white" style="background: #0f1056;">
                   FMA 06
                 </span>
               </th>
-              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 25%; text-align: left;">
+              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; text-align: left;">
                 <span class="badge rounded-pill px-3 py-2 text-white" style="background: #0f1056;">
                   FMA 09
                 </span>
