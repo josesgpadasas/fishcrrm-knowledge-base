@@ -341,10 +341,105 @@ async function loadFMAProfile() {
   
   try {
     const data = await dataService.getFMAProfile();
-    // ... rest of FMA profile loading code
-    // (Full implementation would be here - see scripts.html for reference)
+    
+    if (!data || data.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-inbox display-6 d-block mb-2 opacity-50"></i>
+          <p class="mb-0">No FMA profile data available.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Group rows by Key Characteristics (case-insensitive, trimmed)
+    const grouped = {};
+    data.forEach(row => {
+      const keyChar = (row.KEY_CHARACTERISTICS || row['Key Characteristics'] || '').toString().trim();
+      const normalizedKey = keyChar.toLowerCase();
+      
+      if (!grouped[normalizedKey]) {
+        grouped[normalizedKey] = {
+          keyChar: keyChar || 'Not Specified',
+          rows: []
+        };
+      }
+      
+      // Get FMA values - try multiple possible column names and preserve exact formatting
+      let fma06 = row['FMA 06'] || row['FMA_06'] || row['FMA06'] || row['FMA 6'] || row['FMA_6'] || row['FMA6'] || '';
+      let fma09 = row['FMA 09'] || row['FMA_09'] || row['FMA09'] || row['FMA 9'] || row['FMA_9'] || row['FMA9'] || '';
+      
+      // Preserve the exact value from the sheet (convert to string and trim leading/trailing whitespace)
+      fma06 = fma06 !== '' ? String(fma06).trim() : 'Not Specified';
+      fma09 = fma09 !== '' ? String(fma09).trim() : 'Not Specified';
+      
+      grouped[normalizedKey].rows.push({
+        measurement: row.MEASUREMENT || 'Not Specified',
+        fma06: fma06,
+        fma09: fma09
+      });
+    });
+
+    // Create comparison table with merged rows
+    const tableRows = [];
+    Object.keys(grouped).sort().forEach(normalizedKey => {
+      const group = grouped[normalizedKey];
+      const rowCount = group.rows.length;
+      
+      group.rows.forEach((row, index) => {
+        const isFirstRow = index === 0;
+        
+        tableRows.push(`
+          <tr style="transition: background-color 0.2s ease;">
+            ${isFirstRow ? `
+              <td class="fw-semibold" style="padding: 1rem 0.75rem; vertical-align: middle; text-align: left;" rowspan="${rowCount}">
+                ${escapeHtml(group.keyChar)}
+              </td>
+            ` : ''}
+            <td style="padding: 1rem 0.75rem; vertical-align: middle; color: #6c757d; text-align: left;">
+              ${escapeHtml(row.measurement)}
+            </td>
+            <td class="fw-semibold" style="padding: 1rem 0.75rem; vertical-align: middle; color: #151269; white-space: pre-wrap; text-align: left;">${escapeHtml(row.fma06)}</td>
+            <td class="fw-semibold" style="padding: 1rem 0.75rem; vertical-align: middle; color: #151269; white-space: pre-wrap; text-align: left;">${escapeHtml(row.fma09)}</td>
+          </tr>
+        `);
+      });
+    });
+
+    container.innerHTML = `
+      <div class="table-responsive rounded-3 border shadow-sm">
+        <table class="table table-hover mb-0 align-middle">
+          <thead style="background: #f8f9fa;">
+            <tr>
+              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 30%; text-align: left;">Key Characteristics</th>
+              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 20%; text-align: left;">Measurement</th>
+              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 25%; text-align: left;">
+                <span class="badge rounded-pill px-3 py-2 text-white" style="background: #0f1056;">
+                  FMA 06
+                </span>
+              </th>
+              <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 25%; text-align: left;">
+                <span class="badge rounded-pill px-3 py-2 text-white" style="background: #0f1056;">
+                  FMA 09
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows.join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
   } catch (err) {
-    console.error('Load FMA profile error:', err);
+    console.error('Load FMA Profile error:', err);
+    container.innerHTML = `
+      <div class="alert alert-danger rounded-4 text-center py-4">
+        <i class="bi bi-exclamation-triangle display-6"></i>
+        <p class="mt-3 mb-0">Failed to load FMA profile data. Please try again.</p>
+        <small class="text-muted">Error: ${escapeHtml(err.message)}</small>
+      </div>
+    `;
   }
 }
 
