@@ -348,13 +348,13 @@ async function loadMunicipalities() {
     console.log('First 3 rows sample:', data.slice(0, 3));
     
     // Extract unique FMAs, regions & provinces
-    // Use direct property access since we know the headers are correct
-    const fmas = [...new Set(data.map(r => r.FMA_ID || r['FMA_ID']).filter(Boolean))].sort();
-    const regions = [...new Set(data.map(r => r.REGION || r['REGION']).filter(Boolean))].sort();
+    // Use direct property access since we know the headers are correct from console log
+    const fmas = [...new Set(data.map(r => r.FMA_ID).filter(Boolean))].sort();
+    const regions = [...new Set(data.map(r => r.REGION).filter(Boolean))].sort();
     const provincesByRegion = {};
     data.forEach(row => {
-      const region = row.REGION || row['REGION'];
-      const province = row.PROVINCE || row['PROVINCE'];
+      const region = row.REGION;
+      const province = row.PROVINCE;
       if (region) {
         if (!provincesByRegion[region]) provincesByRegion[region] = new Set();
         if (province) provincesByRegion[region].add(province);
@@ -362,9 +362,11 @@ async function loadMunicipalities() {
     });
     
     console.log('Extracted filters:', { 
-      fmas: fmas.length, 
-      regions: regions.length, 
-      provincesByRegion: Object.keys(provincesByRegion).length 
+      fmasCount: fmas.length, 
+      regionsCount: regions.length, 
+      provincesByRegionCount: Object.keys(provincesByRegion).length,
+      sampleFMA: fmas[0],
+      sampleRegion: regions[0]
     });
 
     // Convert sets to sorted arrays
@@ -456,13 +458,15 @@ async function loadMunicipalities() {
       const province = provinceSelect?.value || '';
 
       let filtered = data;
-      if (fma) filtered = filtered.filter(r => (r.FMA_ID || r['FMA_ID']) === fma);
-      if (region) filtered = filtered.filter(r => (r.REGION || r['REGION']) === region);
-      if (province) filtered = filtered.filter(r => (r.PROVINCE || r['PROVINCE']) === province);
+      if (fma) filtered = filtered.filter(r => r.FMA_ID === fma);
+      if (region) filtered = filtered.filter(r => r.REGION === region);
+      if (province) filtered = filtered.filter(r => r.PROVINCE === province);
 
       console.log(`Rendering ${filtered.length} municipalities (filtered from ${data.length})`);
-      console.log('tbody element:', tbody);
-      console.log('Sample filtered row:', filtered[0]);
+      console.log('tbody element exists:', !!tbody);
+      if (filtered.length > 0) {
+        console.log('Sample filtered row:', filtered[0]);
+      }
 
       if (!tbody) {
         console.error('tbody is null in renderTable!');
@@ -470,10 +474,10 @@ async function loadMunicipalities() {
       }
 
       const html = filtered.length ? filtered.map(row => {
-        const fmaId = row.FMA_ID || row['FMA_ID'] || '';
-        const region = row.REGION || row['REGION'] || '';
-        const province = row.PROVINCE || row['PROVINCE'] || '';
-        const municipality = row.MUNICIPALITY || row['MUNICIPALITY'] || '';
+        const fmaId = row.FMA_ID || '';
+        const region = row.REGION || '';
+        const province = row.PROVINCE || '';
+        const municipality = row.MUNICIPALITY || '';
         
         return `
         <tr style="transition: background-color 0.2s ease;">
@@ -484,7 +488,7 @@ async function loadMunicipalities() {
           </td>
           <td>${escapeHtml(region || '-')}</td>
           <td>${escapeHtml(province || '-')}</td>
-          <td class="pe-4 fw-semibold">${escapeHtml(municipality || '-')}          </td>
+          <td class="pe-4 fw-semibold">${escapeHtml(municipality || '-')}</td>
         </tr>
       `;
       }).join('') : `
