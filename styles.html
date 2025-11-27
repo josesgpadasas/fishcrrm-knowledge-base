@@ -454,6 +454,211 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(15, 16, 86, 0.4);
   }
+  
+  /* Activities Timeline Card - Desktop/Tablet Styles */
+  .activity-card-body {
+    padding: 1.5rem;
+  }
+  
+  .activity-date-badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .activity-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .activity-title {
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+  
+  .activity-detail-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .activity-reference-btn {
+    padding: 0.5rem 1rem;
+  }
+  
+  /* Mobile Optimizations for Activities Timeline */
+  @media (max-width: 767.98px) {
+    /* Adjust timeline positioning for mobile */
+    .timeline {
+      padding-left: 1.5rem;
+    }
+    
+    .timeline::before {
+      left: 0.5rem;
+      width: 2px;
+    }
+    
+    .timeline-item {
+      margin-bottom: 1.5rem;
+    }
+    
+    .timeline-item::before {
+      left: -1.35rem;
+      width: 12px;
+      height: 12px;
+      border-width: 2px;
+      top: 0.5rem;
+    }
+    
+    /* Card body padding reduction for mobile */
+    .activity-card-body {
+      padding: 1rem;
+    }
+    
+    /* Date badge adjustments */
+    .activity-date-badge {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    /* Title section adjustments */
+    .activity-title-section {
+      margin-bottom: 1rem !important;
+    }
+    
+    .activity-label {
+      font-size: 0.7rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .activity-title {
+      font-size: 1.1rem;
+      line-height: 1.3;
+    }
+    
+    /* Details section - ensure full width stacking */
+    .activity-details {
+      margin-bottom: 1rem !important;
+    }
+    
+    .activity-details .col-12 {
+      margin-bottom: 0.75rem;
+    }
+    
+    .activity-details .col-12:last-child {
+      margin-bottom: 0;
+    }
+    
+    .activity-detail-label {
+      font-size: 0.7rem;
+      margin-bottom: 0.4rem;
+    }
+    
+    .activity-detail-value {
+      font-size: 0.9rem;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    /* Reference section adjustments */
+    .activity-reference-section {
+      padding-top: 0.75rem !important;
+      margin-top: 0.75rem !important;
+    }
+    
+    .activity-reference-btn {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+    }
+    
+    /* Reduce card shadow on mobile for better performance */
+    .activity-timeline-card {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Adjust hover effect for mobile (touch devices) */
+    .activity-timeline-card:active {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+    }
+  }
+  
+  /* Extra small devices */
+  @media (max-width: 575.98px) {
+    .activity-card-body {
+      padding: 0.875rem;
+    }
+    
+    .activity-date-badge {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+    }
+    
+    .activity-title {
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+    
+    .activity-detail-value {
+      font-size: 0.85rem;
+    }
+    
+    .activity-reference-btn {
+      padding: 0.45rem 0.65rem;
+      font-size: 0.8rem;
+    }
+  }
+  
+  /* Activities Filters - Mobile Optimizations */
+  @media (max-width: 767.98px) {
+    .activities-header {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 1rem !important;
+    }
+    
+    .activities-title {
+      width: 100%;
+      margin-bottom: 0;
+    }
+    
+    .activities-filters {
+      width: 100%;
+      flex-direction: column;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+    
+    .activities-filter-item {
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 0.5rem;
+    }
+    
+    .activities-filter-label {
+      margin-bottom: 0;
+      margin-right: 0 !important;
+    }
+    
+    .activities-filter-input,
+    .activities-filter-select {
+      width: 100% !important;
+      min-width: 100% !important;
+    }
+  }
+  
+  @media (max-width: 575.98px) {
+    .activities-filter-label-text {
+      font-size: 0.875rem;
+    }
+    
+    .activities-filter-input,
+    .activities-filter-select {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+    }
+  }
 
   /* === FOOTER === */
   footer {
