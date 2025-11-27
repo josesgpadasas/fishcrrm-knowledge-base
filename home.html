@@ -1,0 +1,223 @@
+<!-- home.html -->
+<!-- === FULL-WIDTH HERO === -->
+<div class="hero-section">
+  <!-- Background Image with Parallax Effect -->
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="
+    background-image: url('https://oceans.ubc.ca/files/2018/01/the-fishermen-2983615_1920.jpg');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.8);
+    z-index: 0;
+  "></div>
+
+  <!-- Gradient Overlay -->
+  <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100" style="z-index: 1;"></div>
+
+  <!-- Content -->
+  <div class="container-fluid hero-content text-center text-white px-4" style="max-width: 95%;">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-8">
+        <span class="badge bg-white text-primary rounded-pill px-3 py-2 mb-3 fw-bold animate-fade-up">
+          <i class="bi bi-stars me-1"></i> Centralized Repository
+        </span>
+        <h1 class="display-4 fw-bold mb-4 animate-fade-up delay-100 text-shadow text-white hero-title">
+          FishCRRM 1.1 Knowledge Base
+        </h1>
+        <p class="lead fs-5 mb-5 opacity-90 animate-fade-up delay-200" style="font-weight: 300; line-height: 1.8;">
+          A centralized repository for the Fisheries and Coastal Resilient Resource Planning and Management (FishCRRM)
+          1.1 Component of the National Fisheries Research and Development Institute's
+          <strong class="fw-semibold text-info">FishCoRe Project Management Office</strong>.
+          Access curated resources, tools, and data seamlessly.
+        </p>
+        <div class="d-flex justify-content-center gap-3 animate-fade-up delay-300">
+          <a href="#learnmore" 
+             class="btn hero-learn-more-btn btn-lg px-5 py-3 fw-semibold d-inline-flex align-items-center gap-2 text-white rounded-pill"
+             onclick="event.preventDefault(); navigate('#learnmore')"
+             style="background: #0f1056; border: none; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);">
+            <span>Learn More</span>
+            <i class="bi bi-arrow-down-circle"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- === MAIN CONTENT === -->
+<div class="container-fluid" style="margin-top: -100px; position: relative; z-index: 10; max-width: 95%;">
+
+  <!-- === QUICK STATS DASHBOARD === -->
+  <div class="glass-panel p-4 p-md-5 mb-5 animate-fade-up delay-100">
+    <div class="row g-4" id="quick-stats">
+      <!-- Card 1 -->
+      <div class="col-md-4">
+        <div class="glass-card stat-card bg-primary text-white h-100 border-0">
+          <div class="d-flex justify-content-between align-items-start position-relative z-1">
+            <div>
+              <h6 class="text-white-50 text-uppercase letter-spacing-1 mb-2">NFRDI FishCore Personnel</h6>
+              <h2 class="display-4 fw-bold mb-0 text-white" id="stat-internal">0</h2>
+            </div>
+            <div class="icon-box bg-white bg-opacity-25 rounded-circle p-3">
+              <i class="bi bi-people fs-2"></i>
+            </div>
+          </div>
+          <p class="mt-3 mb-0 small opacity-75">Organic & Contract of Service personnel</p>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-md-4">
+        <div class="glass-card stat-card h-100 border-0" style="background: linear-gradient(135deg, #00b894, #00cec9);">
+          <div class="d-flex justify-content-between align-items-start position-relative z-1">
+            <div>
+              <h6 class="text-white-50 text-uppercase letter-spacing-1 mb-2">Activities</h6>
+              <h2 class="display-4 fw-bold mb-0 text-white" id="stat-activities">0</h2>
+            </div>
+            <div class="icon-box bg-white bg-opacity-25 rounded-circle p-3">
+              <i class="bi bi-calendar-check fs-2"></i>
+            </div>
+          </div>
+          <p class="mt-3 mb-0 small opacity-75">Capacity building trainings, meetings and other activities conducted</p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-md-4">
+        <div class="glass-card stat-card h-100 border-0" style="background: linear-gradient(135deg, #fdcb6e, #e17055);">
+          <div class="d-flex justify-content-between align-items-start position-relative z-1">
+            <div>
+              <h6 class="text-white-50 text-uppercase letter-spacing-1 mb-2">Resources</h6>
+              <h2 class="display-4 fw-bold mb-0 text-white" id="stat-files">0</h2>
+            </div>
+            <div class="icon-box bg-white bg-opacity-25 rounded-circle p-3">
+              <i class="bi bi-folder2-open fs-2"></i>
+            </div>
+          </div>
+          <p class="mt-3 mb-0 small opacity-75">Operation Manual, Guidelines, Policies, Articles and other reference
+            materials</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === QUICK LINKS === -->
+  <div class="mb-5">
+    <h3 class="fw-bold mb-4 text-center animate-fade-up delay-200" style="color: #151269;"><i
+        class="bi bi-eye me-2" style="color: #151269;"></i>Quick Access</h3>
+    <div class="row g-4 justify-content-center animate-fade-up delay-300">
+
+      <!-- Structure -->
+      <div class="col-md-6 col-lg-4">
+        <a href="#structure" onclick="event.preventDefault(); navigate('#structure')" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+          <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-diagram-3"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold" style="color: #151269;">Implementation Structure</div>
+            <small class="text-muted">Implementation structure of the FishCoRe Project</small>
+          </div>
+          <i class="bi bi-arrow-right text-muted"></i>
+        </a>
+      </div>
+
+      <!-- FMA Profile -->
+      <div class="col-md-6 col-lg-4">
+        <a href="#fmaprofile" onclick="event.preventDefault(); navigate('#fmaprofile')" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+          <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-bar-chart-line"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold" style="color: #151269;">FMA Profile</div>
+            <small class="text-muted">Characteristics and measurements for FMA 06 and FMA 09</small>
+          </div>
+          <i class="bi bi-arrow-right text-muted"></i>
+        </a>
+      </div>
+
+      <!-- Municipalities -->
+      <div class="col-md-6 col-lg-4">
+        <a href="#municipalities" onclick="event.preventDefault(); navigate('#municipalities')" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+          <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold" style="color: #151269;">Municipalities</div>
+            <small class="text-muted">Municipalities covered by the FMA 6 and FMA 9</small>
+          </div>
+          <i class="bi bi-arrow-right text-muted"></i>
+        </a>
+      </div>
+
+      <!-- Activities -->
+      <div class="col-md-6 col-lg-4">
+        <a href="#activities" onclick="event.preventDefault(); navigate('#activities')" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+          <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-calendar-event"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold" style="color: #151269;">Activities Conducted</div>
+            <small class="text-muted">Timeline of activities and workshops conducted</small>
+          </div>
+          <i class="bi bi-arrow-right text-muted"></i>
+        </a>
+      </div>
+
+      <!-- Directory -->
+      <div class="col-md-6 col-lg-4">
+        <a href="#directory" onclick="event.preventDefault(); navigate('#directory')" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+          <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-people"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold" style="color: #151269;">Directory</div>
+            <small class="text-muted">Contact information for internal and external personnel</small>
+          </div>
+          <i class="bi bi-arrow-right text-muted"></i>
+        </a>
+      </div>
+
+      <!-- References -->
+      <div class="col-md-6 col-lg-4">
+        <a href="#references" onclick="event.preventDefault(); navigate('#references')" class="quick-link-card text-decoration-none d-flex align-items-center p-3 rounded-3" style="background: rgba(21, 18, 105, 0.05); border: 1px solid rgba(21, 18, 105, 0.1); transition: all 0.3s ease;">
+          <div class="text-white rounded-circle p-2 me-3" style="background: #151269; min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold" style="color: #151269;">References</div>
+            <small class="text-muted">Manuals, guidelines, policies, articles, and other references</small>
+          </div>
+          <i class="bi bi-arrow-right text-muted"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- === RECENT ACTIVITIES === -->
+  <div class="mb-5 animate-fade-up delay-300">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="fw-bold mb-0 mx-auto" style="color: #151269;"><i class="bi bi-clock-history me-2" style="color: #151269;"></i>Recent Updates
+      </h3>
+    </div>
+
+    <div id="recent-activities" class="row g-4">
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4 mb-4">
+      <a href="#activities" 
+         onclick="event.preventDefault(); navigate('#activities')" 
+         class="btn view-all-btn d-inline-flex align-items-center gap-2 fw-semibold px-4 py-2 rounded-pill text-white"
+         style="background: #0f1056; border: none; transition: all 0.3s ease;">
+        <span>View All Activities</span>
+        <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+
+</div>
+
