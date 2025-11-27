@@ -1338,12 +1338,129 @@ async function loadFMAProfile() {
   }
 }
 
+// Page-based search mapping
+const PAGE_SEARCH_MAP = {
+  'structure': {
+    title: 'Implementation Structure',
+    route: '#structure',
+    icon: 'bi-diagram-3',
+    keywords: ['structure', 'implementation', 'npmo', 'rpiu', 'fcu', 'organization', 'hierarchy', 'national', 'fma', 'regional', 'bfar', 'component'],
+    description: 'View the organizational structure and implementation framework of the FishCRRM Component.'
+  },
+  'municipalities': {
+    title: 'Municipalities',
+    route: '#municipalities',
+    icon: 'bi-geo-alt',
+    keywords: ['municipality', 'municipalities', 'location', 'region', 'province', 'fma', 'fma 6', 'fma 9', 'fma-06', 'fma-09', 'geography', 'area', 'coverage'],
+    description: 'Browse municipalities covered by FMA 6 and FMA 9, including regions and provinces.'
+  },
+  'activities': {
+    title: 'Activities',
+    route: '#activities',
+    icon: 'bi-calendar-event',
+    keywords: ['activity', 'activities', 'training', 'meeting', 'event', 'workshop', 'seminar', 'conference', 'coordination', 'conducted', 'timeline', 'schedule', 'date'],
+    description: 'Explore activities, trainings, and coordination meetings conducted under the FishCRRM Component.'
+  },
+  'directory': {
+    title: 'Directory',
+    route: '#directory',
+    icon: 'bi-people',
+    keywords: ['directory', 'contact', 'personnel', 'staff', 'employee', 'team', 'member', 'email', 'phone', 'internal', 'external', 'npmo', 'directory', 'people'],
+    description: 'Find contact information for internal staff, external partners, and NPMO personnel.'
+  },
+  'references': {
+    title: 'References',
+    route: '#references',
+    icon: 'bi-file-earmark-text',
+    keywords: ['reference', 'references', 'document', 'documents', 'file', 'files', 'pdf', 'resource', 'materials', 'publication', 'report', 'category'],
+    description: 'Access reference documents, reports, and materials related to the FishCRRM Component.'
+  },
+  'fmaprofile': {
+    title: 'FMA Profile',
+    route: '#fmaprofile',
+    icon: 'bi-bar-chart-line',
+    keywords: ['fma profile', 'fma 06', 'fma 09', 'fma-06', 'fma-09', 'characteristics', 'measurement', 'profile', 'fma', 'statistics', 'data'],
+    description: 'View detailed characteristics and measurements for FMA 06 and FMA 09.'
+  },
+  'learnmore': {
+    title: 'Learn More',
+    route: '#learnmore',
+    icon: 'bi-info-circle',
+    keywords: ['learn more', 'about', 'overview', 'project', 'fishcrrm', 'component', 'intervention', 'coverage', 'fishcore', 'information', 'details'],
+    description: 'Learn more about the FishCRRM 1.1 Component, its interventions, and coverage areas.'
+  },
+  'about': {
+    title: 'About',
+    route: '#about',
+    icon: 'bi-question-circle',
+    keywords: ['about', 'help', 'guide', 'how to', 'knowledge base', 'usage', 'tutorial', 'documentation'],
+    description: 'Learn how to use the Knowledge Base and find information about the system.'
+  }
+};
+
+// Map sheet names to pages
+const SHEET_TO_PAGE_MAP = {
+  'Implementation_Structure': { page: 'structure', title: 'Implementation Structure', icon: 'bi-diagram-3' },
+  'FMA_6_&_9_Municipalities': { page: 'municipalities', title: 'Municipalities', icon: 'bi-geo-alt' },
+  'Activities_Conducted': { page: 'activities', title: 'Activities', icon: 'bi-calendar-event' },
+  'Internal_Directory': { page: 'directory', title: 'Directory (Internal)', icon: 'bi-people' },
+  'External_Directory': { page: 'directory', title: 'Directory (External)', icon: 'bi-people' },
+  'NPMO_Directory': { page: 'directory', title: 'Directory (NPMO)', icon: 'bi-people' },
+  'Reference_Files': { page: 'references', title: 'References', icon: 'bi-file-earmark-text' },
+  'FMA_Profile': { page: 'fmaprofile', title: 'FMA Profile', icon: 'bi-bar-chart-line' }
+};
+
+// Helper function to format content result
+function formatContentResult(result, pageInfo) {
+  const route = `#${pageInfo.page}`;
+  let preview = '';
+  let matchedValue = '';
+
+  // Get the matched field value for preview
+  if (result._field && result[result._field]) {
+    matchedValue = String(result[result._field]);
+    preview = matchedValue.length > 100 ? matchedValue.substring(0, 100) + '...' : matchedValue;
+  } else {
+    // Try to get any relevant field value
+    const fields = Object.keys(result).filter(k => !k.startsWith('_') && result[k]);
+    if (fields.length > 0) {
+      matchedValue = String(result[fields[0]]);
+      preview = matchedValue.length > 100 ? matchedValue.substring(0, 100) + '...' : matchedValue;
+    }
+  }
+
+  return {
+    type: 'content',
+    title: pageInfo.title,
+    route: route,
+    icon: pageInfo.icon,
+    preview: preview,
+    matchedField: result._field || '',
+    score: result._score || 0
+  };
+}
+
 async function loadSearchResults(hash = '') {
   const params = new URLSearchParams(hash.split('?')[1] || '');
   const query = params.get('q') || '';
   const queryEl = document.getElementById('search-query');
   const resultsEl = document.getElementById('search-results');
-  
+  const recentSearchesEl = document.getElementById('recent-searches');
+
+  // Load recent searches
+  const recent = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+  if (recentSearchesEl) {
+    if (recent.length > 0) {
+      recentSearchesEl.innerHTML = recent.slice(0, 5).map(s => `
+        <a href="#" onclick="globalSearch('${escapeHtml(s)}'); return false;" class="d-block text-decoration-none text-muted small mb-2">
+          <i class="bi bi-arrow-return-left me-2"></i>${escapeHtml(s)}
+        </a>
+      `).join('');
+    } else {
+      recentSearchesEl.innerHTML = '<p class="text-muted small mb-0">No recent searches.</p>';
+    }
+  }
+
   if (!query) {
     if (queryEl) queryEl.innerHTML = 'Enter a search term to find relevant pages.';
     if (resultsEl) {
@@ -1361,11 +1478,311 @@ async function loadSearchResults(hash = '') {
   if (resultsEl) resultsEl.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status" style="color: #151269;"></div><p class="mt-2 text-muted small">Searching...</p></div>';
 
   try {
-    const searchResponse = await dataService.searchAll(query);
-    // ... rest of search results rendering
-    // (Full implementation would be here - see scripts.html for reference)
+    const queryLower = query.toLowerCase().trim();
+    const allResults = [];
+
+    // 1. Search through page mappings (keyword-based)
+    Object.keys(PAGE_SEARCH_MAP).forEach(pageKey => {
+      const page = PAGE_SEARCH_MAP[pageKey];
+      let matchScore = 0;
+      const matchedKeywords = [];
+
+      // Check if query matches title exactly or partially
+      const titleLower = page.title.toLowerCase();
+      if (titleLower === queryLower) {
+        matchScore += 20; // Exact title match
+        matchedKeywords.push(page.title);
+      } else if (titleLower.includes(queryLower)) {
+        matchScore += 15; // Title contains query
+        matchedKeywords.push(page.title);
+      } else if (queryLower.includes(titleLower)) {
+        matchScore += 12; // Query contains title
+        matchedKeywords.push(page.title);
+      }
+
+      // Check if query matches any keyword
+      page.keywords.forEach(keyword => {
+        const keywordLower = keyword.toLowerCase();
+        if (keywordLower === queryLower) {
+          matchScore += 10; // Exact keyword match
+          matchedKeywords.push(keyword);
+        } else if (keywordLower.includes(queryLower)) {
+          matchScore += 5; // Keyword contains query
+          matchedKeywords.push(keyword);
+        } else if (queryLower.includes(keywordLower)) {
+          matchScore += 3; // Query contains keyword
+          matchedKeywords.push(keyword);
+        }
+      });
+
+      // Check route/page key match
+      if (pageKey === queryLower || pageKey.includes(queryLower) || queryLower.includes(pageKey)) {
+        matchScore += 8;
+      }
+
+      if (matchScore > 0) {
+        allResults.push({
+          type: 'page',
+          ...page,
+          score: matchScore,
+          matchedKeywords: [...new Set(matchedKeywords)].slice(0, 3) // Remove duplicates
+        });
+      }
+    });
+    
+    console.log('Page-based results:', allResults.length);
+
+    // 2. Search through sheet data (content-based)
+    try {
+      const searchResponse = await dataService.searchAll(query);
+      console.log('Search response:', searchResponse);
+      
+      if (searchResponse && searchResponse.results && searchResponse.results.length > 0) {
+        const sheetResults = searchResponse.results;
+        console.log('Sheet results found:', sheetResults.length);
+        
+        // Group results by sheet and map to pages
+        const contentResultsByPage = {};
+        
+        sheetResults.forEach(result => {
+          console.log('Processing result:', result._sheet, result);
+          const pageInfo = SHEET_TO_PAGE_MAP[result._sheet];
+          if (pageInfo) {
+            const pageKey = pageInfo.page;
+            if (!contentResultsByPage[pageKey]) {
+              contentResultsByPage[pageKey] = {
+                pageInfo: pageInfo,
+                results: []
+              };
+            }
+            contentResultsByPage[pageKey].results.push(result);
+          } else {
+            console.log('No page mapping found for sheet:', result._sheet);
+          }
+        });
+
+        // Add content results grouped by page
+        Object.keys(contentResultsByPage).forEach(pageKey => {
+          const { pageInfo, results } = contentResultsByPage[pageKey];
+          // Sort results by score
+          results.sort((a, b) => (b._score || 0) - (a._score || 0));
+          const topResult = results[0]; // Get the highest scored result
+          const contentResult = formatContentResult(topResult, pageInfo);
+          contentResult.matchCount = results.length;
+          contentResult.score = (topResult._score || 0) + 5; // Boost content results slightly
+          // Store all matching items for display
+          contentResult.matchingItems = results.map(r => {
+            // Get the matched field value or a relevant field value
+            let displayValue = '';
+            if (r._field && r[r._field]) {
+              displayValue = String(r[r._field]);
+            } else {
+              // Try to get a meaningful field value
+              const fields = Object.keys(r).filter(k => !k.startsWith('_') && r[k]);
+              if (fields.length > 0) {
+                // Prefer name fields, then title fields, then first available
+                const nameField = fields.find(f => f.includes('NAME') || f.includes('TITLE') || f.includes('MUNICIPALITY'));
+                displayValue = String(r[nameField || fields[0]]);
+              }
+            }
+            return {
+              value: displayValue,
+              field: r._field || '',
+              score: r._score || 0
+            };
+          }).filter(item => item.value); // Remove empty items
+          allResults.push(contentResult);
+        });
+      } else {
+        console.log('No sheet results found');
+      }
+    } catch (err) {
+      console.error('Error searching sheet data:', err);
+      // Continue with page-based results only
+    }
+
+    console.log('All results before processing:', allResults.length, allResults);
+
+    // Sort all results by score
+    allResults.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+    // Remove duplicates (same route) - keep highest score, but merge matching items
+    const seenRoutes = new Map();
+    allResults.forEach(result => {
+      if (result && result.route) {
+        if (!seenRoutes.has(result.route)) {
+          seenRoutes.set(result.route, result);
+        } else {
+          const existing = seenRoutes.get(result.route);
+          // If new result has higher score, replace it
+          if ((result.score || 0) > (existing.score || 0)) {
+            seenRoutes.set(result.route, result);
+          } else if (result.matchingItems && result.matchingItems.length > 0) {
+            // If existing doesn't have matching items but new one does, merge them
+            if (!existing.matchingItems || existing.matchingItems.length === 0) {
+              existing.matchingItems = result.matchingItems;
+              existing.matchCount = result.matchCount || existing.matchCount;
+            } else {
+              // Merge matching items, avoiding duplicates
+              const existingValues = new Set(existing.matchingItems.map(m => m.value));
+              result.matchingItems.forEach(item => {
+                if (!existingValues.has(item.value)) {
+                  existing.matchingItems.push(item);
+                  existingValues.add(item.value);
+                }
+              });
+              existing.matchCount = existing.matchingItems.length;
+            }
+          }
+        }
+      }
+    });
+
+    const uniqueResults = Array.from(seenRoutes.values());
+    
+    // Sort again after deduplication
+    uniqueResults.sort((a, b) => (b.score || 0) - (a.score || 0));
+    
+    console.log('Unique results after processing:', uniqueResults.length, uniqueResults);
+    
+    // Fallback: if no results but we have page matches, show them anyway
+    if (uniqueResults.length === 0 && allResults.length > 0) {
+      console.warn('Deduplication removed all results, using original results');
+      uniqueResults.push(...allResults.slice(0, 10));
+    }
+
+    if (resultsEl) {
+      if (uniqueResults.length > 0) {
+        resultsEl.innerHTML = `
+          <h5 class="fw-bold mb-4" style="color: #151269;">
+            <i class="bi bi-check-circle me-2"></i>Found ${uniqueResults.length} ${uniqueResults.length === 1 ? 'result' : 'results'}
+          </h5>
+          <div class="vstack gap-3">
+            ${uniqueResults.map(result => {
+              if (result.type === 'content') {
+                return `
+                  <div class="card border-0 shadow-sm hover-lift" style="transition: all 0.3s ease;">
+                    <div class="card-body p-4">
+                      <div class="d-flex align-items-start">
+                        <div class="text-white rounded-circle p-3 me-3 shadow-sm" style="background: #151269; min-width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                          <i class="${result.icon} fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                          <h5 class="card-title fw-bold mb-2" style="color: #151269;">
+                            <a href="${result.route}" class="text-decoration-none" style="color: #151269;">${escapeHtml(result.title)}</a>
+                            ${result.matchCount > 1 ? `<span class="badge rounded-pill ms-2" style="background: rgba(21, 18, 105, 0.1); color: #151269;">${result.matchCount} matches</span>` : ''}
+                          </h5>
+                          ${result.preview ? `
+                            <p class="card-text text-muted mb-2">
+                              <small><i class="bi bi-quote me-1"></i>${escapeHtml(result.preview)}</small>
+                            </p>
+                          ` : ''}
+                          ${result.matchedField ? `
+                            <small class="text-muted d-block mb-3">
+                              <i class="bi bi-tag me-1"></i>Found in: <strong>${escapeHtml(result.matchedField)}</strong>
+                            </small>
+                          ` : ''}
+                          ${result.matchingItems && result.matchingItems.length > 0 ? `
+                            <div class="mb-3">
+                              <small class="text-muted d-block mb-2 fw-semibold">
+                                <i class="bi bi-list-ul me-1"></i>Matching Items:
+                              </small>
+                              <div class="d-flex flex-wrap gap-2" style="max-width: 100%; word-wrap: break-word;">
+                                ${result.matchingItems.slice(0, 10).map(item => {
+                                  const displayValue = String(item.value).length > 50 
+                                    ? String(item.value).substring(0, 50) + '...' 
+                                    : String(item.value);
+                                  return `
+                                    <span class="badge rounded-pill px-2 py-1" style="background: rgba(21, 18, 105, 0.15); color: #151269; font-size: 0.8rem; max-width: 100%; word-break: break-word; white-space: normal;">
+                                      <i class="bi bi-check-circle me-1"></i>${escapeHtml(displayValue)}
+                                    </span>
+                                  `;
+                                }).join('')}
+                                ${result.matchingItems.length > 10 ? `
+                                  <span class="badge rounded-pill px-2 py-1 text-muted" style="background: rgba(0, 0, 0, 0.05); font-size: 0.8rem;">
+                                    +${result.matchingItems.length - 10} more
+                                  </span>
+                                ` : ''}
+                              </div>
+                            </div>
+                          ` : ''}
+                          <a href="${result.route}" class="btn btn-sm" style="background: #0f1056; color: white;">
+                            <i class="bi bi-arrow-right me-1"></i>View Page
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              } else {
+                return `
+                  <div class="card border-0 shadow-sm hover-lift" style="transition: all 0.3s ease;">
+                    <div class="card-body p-4">
+                      <div class="d-flex align-items-start">
+                        <div class="text-white rounded-circle p-3 me-3 shadow-sm" style="background: #151269; min-width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                          <i class="${result.icon} fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                          <h5 class="card-title fw-bold mb-2" style="color: #151269;">
+                            <a href="${result.route}" class="text-decoration-none" style="color: #151269;">${result.title}</a>
+                          </h5>
+                          <p class="card-text text-muted mb-3">${result.description}</p>
+                          ${result.matchedKeywords && result.matchedKeywords.length > 0 ? `
+                            <div class="mb-3">
+                              <small class="text-muted d-block mb-1">Matched keywords:</small>
+                              <div class="d-flex flex-wrap gap-2">
+                                ${result.matchedKeywords.map(kw => `
+                                  <span class="badge rounded-pill" style="background: rgba(21, 18, 105, 0.1); color: #151269;">${escapeHtml(kw)}</span>
+                                `).join('')}
+                              </div>
+                            </div>
+                          ` : ''}
+                          <a href="${result.route}" class="btn btn-sm" style="background: #0f1056; color: white;">
+                            <i class="bi bi-arrow-right me-1"></i>View Page
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }
+            }).join('')}
+          </div>
+        `;
+      } else {
+        resultsEl.innerHTML = `
+          <div class="text-center py-5">
+            <i class="bi bi-search display-6 d-block mb-3 text-muted opacity-50"></i>
+            <h5 class="fw-bold mb-2" style="color: #151269;">No results found</h5>
+            <p class="text-muted mb-4">We couldn't find any pages or content matching "<strong>${escapeHtml(query)}</strong>".</p>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+              <a href="#structure" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-diagram-3 me-1"></i>Structure
+              </a>
+              <a href="#municipalities" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-geo-alt me-1"></i>Municipalities
+              </a>
+              <a href="#activities" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-calendar-event me-1"></i>Activities
+              </a>
+              <a href="#directory" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-people me-1"></i>Directory
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    }
   } catch (err) {
     console.error('Search error:', err);
+    if (resultsEl) {
+      resultsEl.innerHTML = `
+        <div class="alert alert-danger rounded-4">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Search failed. Please try again.
+        </div>
+      `;
+    }
   }
 }
 
