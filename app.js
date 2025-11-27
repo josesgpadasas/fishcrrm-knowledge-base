@@ -1298,8 +1298,8 @@ async function loadFMAProfile() {
 
     console.log(`Generating table with ${tableRows.length} rows`);
     container.innerHTML = `
-      <div class="table-responsive rounded-3 border shadow-sm">
-        <table class="table table-hover mb-0 align-middle">
+      <div class="table-responsive rounded-3 border shadow-sm" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table class="table table-hover mb-0 align-middle" style="min-width: 700px;">
           <thead style="background: #f8f9fa;">
             <tr>
               <th class="fw-semibold" style="color: #151269 !important; padding: 1rem 0.75rem; width: 30%; text-align: left;">Key Characteristics</th>
