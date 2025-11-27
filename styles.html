@@ -842,19 +842,44 @@
     border-bottom: 2px solid rgba(21, 18, 105, 0.1);
   }
   
-  /* FMA Profile table responsive scrolling */
+  /* FMA Profile table wrapper - maximize width and enable horizontal scrolling */
   #fma-profile-container {
     overflow-x: visible;
     width: 100%;
   }
   
-  #fma-profile-container .table-responsive {
+  #fma-profile-container .fma-profile-table-wrapper {
     overflow-x: auto !important;
     overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     display: block;
     width: 100%;
     max-width: 100%;
+  }
+  
+  /* Maximize table width on larger screens */
+  #fma-profile-container .fma-profile-table {
+    width: 100%;
+    min-width: 100%;
+    margin: 0;
+    table-layout: auto;
+  }
+  
+  /* Column widths to maximize space usage */
+  #fma-profile-container .fma-profile-table thead th:first-child {
+    width: 30%;
+    min-width: 200px;
+  }
+  
+  #fma-profile-container .fma-profile-table thead th:nth-child(2) {
+    width: 20%;
+    min-width: 150px;
+  }
+  
+  #fma-profile-container .fma-profile-table thead th:nth-child(3),
+  #fma-profile-container .fma-profile-table thead th:nth-child(4) {
+    width: 25%;
+    min-width: 180px;
   }
   
   @media (max-width: 991.98px) {
@@ -883,7 +908,8 @@
       overflow-x: visible !important;
     }
     
-    #fma-profile-container .table-responsive {
+    /* Horizontal scrolling wrapper on smaller screens */
+    #fma-profile-container .fma-profile-table-wrapper {
       overflow-x: auto !important;
       overflow-y: visible;
       display: block;
@@ -893,33 +919,33 @@
       position: relative;
     }
     
-    #fma-profile-container .table-responsive table {
-      min-width: 700px !important; /* Minimum width for FMA Profile table */
+    /* Table maintains minimum width for readability, but can expand */
+    #fma-profile-container .fma-profile-table {
+      min-width: 800px !important;
       width: auto !important;
       margin: 0;
     }
     
-    #fma-profile-container table thead th,
-    #fma-profile-container table tbody td {
+    #fma-profile-container .fma-profile-table thead th,
+    #fma-profile-container .fma-profile-table tbody td {
       white-space: nowrap; /* Prevent text wrapping on mobile */
-      min-width: 120px; /* Minimum column width */
     }
     
     /* Allow wrapping for long content in FMA columns */
-    #fma-profile-container table tbody td:nth-child(3),
-    #fma-profile-container table tbody td:nth-child(4) {
+    #fma-profile-container .fma-profile-table tbody td:nth-child(3),
+    #fma-profile-container .fma-profile-table tbody td:nth-child(4) {
       white-space: normal;
-      min-width: 150px;
+      min-width: 180px;
     }
   }
   
   @media (max-width: 575.98px) {
-    #fma-profile-container .table-responsive table {
-      min-width: 600px !important;
+    #fma-profile-container .fma-profile-table {
+      min-width: 700px !important;
     }
     
-    #fma-profile-container table thead th,
-    #fma-profile-container table tbody td {
+    #fma-profile-container .fma-profile-table thead th,
+    #fma-profile-container .fma-profile-table tbody td {
       padding: 0.75rem 0.5rem;
       font-size: 0.875rem;
     }
