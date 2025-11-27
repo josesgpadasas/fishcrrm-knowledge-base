@@ -283,15 +283,29 @@ async function loadStructure() {
 }
 
 async function loadMunicipalities() {
-  const tbody = document.querySelector('#municipalities-table tbody');
+  // Wait a bit for DOM to be ready
+  let tbody = document.querySelector('#municipalities-table tbody');
+  let retries = 0;
+  while (!tbody && retries < 10) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    tbody = document.querySelector('#municipalities-table tbody');
+    retries++;
+  }
+  
   const table = tbody ? tbody.closest('table') : null;
   const filterPlaceholder = document.getElementById('filter-container-placeholder');
   
   if (!tbody) {
-    console.error('Municipalities table tbody not found');
+    console.error('Municipalities table tbody not found after retries');
+    console.error('Available elements:', {
+      table: document.getElementById('municipalities-table'),
+      filterPlaceholder: filterPlaceholder,
+      allTables: document.querySelectorAll('table').length
+    });
     return;
   }
   
+  console.log('Municipalities table found, loading data...');
   if (table) table.classList.add('table-loading');
 
   try {
@@ -322,27 +336,36 @@ async function loadMunicipalities() {
     // Helper function to get value from row with multiple possible column names
     const getValue = (row, ...keys) => {
       for (const key of keys) {
-        if (row[key] !== undefined && row[key] !== null && row[key] !== '') {
-          return row[key];
+        const value = row[key];
+        if (value !== undefined && value !== null && value !== '') {
+          return value;
         }
       }
       return null;
     };
     
+    // Log first few rows to verify structure
+    console.log('First 3 rows sample:', data.slice(0, 3));
+    
     // Extract unique FMAs, regions & provinces
-    const fmas = [...new Set(data.map(r => getValue(r, 'FMA_ID', 'FMA ID', 'FMAID')).filter(Boolean))].sort();
-    const regions = [...new Set(data.map(r => getValue(r, 'REGION', 'Region')).filter(Boolean))].sort();
+    // Use direct property access since we know the headers are correct
+    const fmas = [...new Set(data.map(r => r.FMA_ID || r['FMA_ID']).filter(Boolean))].sort();
+    const regions = [...new Set(data.map(r => r.REGION || r['REGION']).filter(Boolean))].sort();
     const provincesByRegion = {};
     data.forEach(row => {
-      const region = getValue(row, 'REGION', 'Region');
-      const province = getValue(row, 'PROVINCE', 'Province');
+      const region = row.REGION || row['REGION'];
+      const province = row.PROVINCE || row['PROVINCE'];
       if (region) {
         if (!provincesByRegion[region]) provincesByRegion[region] = new Set();
         if (province) provincesByRegion[region].add(province);
       }
     });
     
-    console.log('Extracted filters:', { fmas, regions, provincesByRegion });
+    console.log('Extracted filters:', { 
+      fmas: fmas.length, 
+      regions: regions.length, 
+      provincesByRegion: Object.keys(provincesByRegion).length 
+    });
 
     // Convert sets to sorted arrays
     Object.keys(provincesByRegion).forEach(region => {
@@ -433,26 +456,24 @@ async function loadMunicipalities() {
       const province = provinceSelect?.value || '';
 
       let filtered = data;
-      if (fma) filtered = filtered.filter(r => {
-        const rowFma = getValue(r, 'FMA_ID', 'FMA ID', 'FMAID');
-        return rowFma === fma;
-      });
-      if (region) filtered = filtered.filter(r => {
-        const rowRegion = getValue(r, 'REGION', 'Region');
-        return rowRegion === region;
-      });
-      if (province) filtered = filtered.filter(r => {
-        const rowProvince = getValue(r, 'PROVINCE', 'Province');
-        return rowProvince === province;
-      });
+      if (fma) filtered = filtered.filter(r => (r.FMA_ID || r['FMA_ID']) === fma);
+      if (region) filtered = filtered.filter(r => (r.REGION || r['REGION']) === region);
+      if (province) filtered = filtered.filter(r => (r.PROVINCE || r['PROVINCE']) === province);
 
       console.log(`Rendering ${filtered.length} municipalities (filtered from ${data.length})`);
+      console.log('tbody element:', tbody);
+      console.log('Sample filtered row:', filtered[0]);
 
-      tbody.innerHTML = filtered.length ? filtered.map(row => {
-        const fmaId = getValue(row, 'FMA_ID', 'FMA ID', 'FMAID');
-        const region = getValue(row, 'REGION', 'Region');
-        const province = getValue(row, 'PROVINCE', 'Province');
-        const municipality = getValue(row, 'MUNICIPALITY', 'Municipality');
+      if (!tbody) {
+        console.error('tbody is null in renderTable!');
+        return;
+      }
+
+      const html = filtered.length ? filtered.map(row => {
+        const fmaId = row.FMA_ID || row['FMA_ID'] || '';
+        const region = row.REGION || row['REGION'] || '';
+        const province = row.PROVINCE || row['PROVINCE'] || '';
+        const municipality = row.MUNICIPALITY || row['MUNICIPALITY'] || '';
         
         return `
         <tr style="transition: background-color 0.2s ease;">
@@ -463,7 +484,7 @@ async function loadMunicipalities() {
           </td>
           <td>${escapeHtml(region || '-')}</td>
           <td>${escapeHtml(province || '-')}</td>
-          <td class="pe-4 fw-semibold">${escapeHtml(municipality || '-')}</td>
+          <td class="pe-4 fw-semibold">${escapeHtml(municipality || '-')}          </td>
         </tr>
       `;
       }).join('') : `
@@ -474,27 +495,38 @@ async function loadMunicipalities() {
           </td>
         </tr>
       `;
+      
+      console.log('Setting tbody.innerHTML, length:', html.length);
+      tbody.innerHTML = html;
+      console.log('tbody.innerHTML set successfully');
     }
 
     // Initial render
+    console.log('Calling renderTable() for initial render...');
     renderTable();
+    console.log('Initial render completed');
 
   } catch (err) {
     console.error('Load municipalities error:', err);
     console.error('Error stack:', err.stack);
     const errorMessage = err.message || 'Unknown error';
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="4" class="text-danger text-center py-4">
-          <i class="bi bi-exclamation-triangle display-6 d-block mb-2"></i>
-          <p class="mb-0">Failed to load municipalities data.</p>
-          <small class="text-muted d-block mt-2">Error: ${escapeHtml(errorMessage)}</small>
-          <small class="text-muted">Check the browser console (F12) for more details.</small>
-        </td>
-      </tr>
-    `;
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="text-danger text-center py-4">
+            <i class="bi bi-exclamation-triangle display-6 d-block mb-2"></i>
+            <p class="mb-0">Failed to load municipalities data.</p>
+            <small class="text-muted d-block mt-2">Error: ${escapeHtml(errorMessage)}</small>
+            <small class="text-muted">Check the browser console (F12) for more details.</small>
+          </td>
+        </tr>
+      `;
+    }
   } finally {
-    if (table) table.classList.remove('table-loading');
+    if (table) {
+      table.classList.remove('table-loading');
+      console.log('Table loading class removed');
+    }
   }
 }
 
