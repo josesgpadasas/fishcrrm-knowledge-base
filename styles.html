@@ -265,8 +265,25 @@
   .table-responsive {
     border-radius: 16px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: visible;
     background: white;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  /* Ensure horizontal scrolling on mobile/tablet */
+  @media (max-width: 991.98px) {
+    .table-responsive {
+      overflow-x: auto;
+      overflow-y: visible;
+      display: block;
+      width: 100%;
+    }
+    
+    .table-responsive table {
+      min-width: 600px; /* Ensure table doesn't shrink too much */
+      width: 100%;
+    }
   }
 
   .table {
@@ -796,6 +813,52 @@
   #fma-profile-container table thead th {
     padding: 1rem 0.75rem;
     border-bottom: 2px solid rgba(21, 18, 105, 0.1);
+  }
+  
+  /* FMA Profile table responsive scrolling */
+  #fma-profile-container .table-responsive {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  @media (max-width: 991.98px) {
+    #fma-profile-container .table-responsive {
+      overflow-x: auto;
+      overflow-y: visible;
+      display: block;
+      width: 100%;
+    }
+    
+    #fma-profile-container .table-responsive table {
+      min-width: 700px; /* Minimum width for FMA Profile table */
+      width: 100%;
+    }
+    
+    #fma-profile-container table thead th,
+    #fma-profile-container table tbody td {
+      white-space: nowrap; /* Prevent text wrapping on mobile */
+      min-width: 120px; /* Minimum column width */
+    }
+    
+    /* Allow wrapping for long content in FMA columns */
+    #fma-profile-container table tbody td:nth-child(3),
+    #fma-profile-container table tbody td:nth-child(4) {
+      white-space: normal;
+      min-width: 150px;
+    }
+  }
+  
+  @media (max-width: 575.98px) {
+    #fma-profile-container .table-responsive table {
+      min-width: 600px;
+    }
+    
+    #fma-profile-container table thead th,
+    #fma-profile-container table tbody td {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.875rem;
+    }
   }
 
   /* === SEARCH PAGE === */
