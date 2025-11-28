@@ -1195,6 +1195,224 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(15, 16, 86, 0.4);
   }
+  
+  /* Reference Card - Desktop/Tablet Styles */
+  .reference-card-body {
+    padding: 1.5rem;
+  }
+  
+  .reference-card-content {
+    margin-bottom: 0;
+  }
+  
+  .reference-card-info {
+    margin-right: 1rem;
+  }
+  
+  .reference-card-header {
+    margin-bottom: 0.5rem;
+  }
+  
+  .reference-card-icon {
+    padding: 0.5rem;
+    margin-right: 0.75rem;
+  }
+  
+  .reference-card-icon i {
+    font-size: 1.25rem;
+  }
+  
+  .reference-card-title {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  
+  .reference-card-badge {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .reference-card-btn {
+    padding: 0.5rem 1.5rem;
+  }
+  
+  /* Mobile Optimizations for Reference Cards */
+  @media (max-width: 767.98px) {
+    /* Card body padding reduction */
+    .reference-card-body {
+      padding: 1rem;
+    }
+    
+    /* Stack content vertically on mobile */
+    .reference-card-content {
+      flex-direction: column;
+      align-items: stretch !important;
+      gap: 1rem;
+    }
+    
+    .reference-card-info {
+      margin-right: 0;
+      width: 100%;
+    }
+    
+    .reference-card-header {
+      margin-bottom: 0.75rem;
+    }
+    
+    .reference-card-icon {
+      padding: 0.4rem;
+      margin-right: 0.75rem;
+    }
+    
+    .reference-card-icon i {
+      font-size: 1.1rem;
+    }
+    
+    .reference-card-title {
+      font-size: 1rem;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+    
+    .reference-card-badge {
+      padding: 0.25rem 0.65rem;
+      font-size: 0.7rem;
+    }
+    
+    /* Full width button on mobile */
+    .reference-card-btn {
+      width: 100%;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+    }
+    
+    /* Reduce card shadow on mobile */
+    .reference-card {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Adjust hover effect for mobile (touch devices) */
+    .reference-card:active {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+    }
+    
+    /* Filters mobile optimization */
+    .reference-filters {
+      margin-bottom: 1rem !important;
+    }
+    
+    .reference-filter-label {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .reference-filter-input,
+    .reference-filter-select {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+    }
+    
+    /* Pagination mobile optimization */
+    #ref-pagination {
+      margin-top: 1rem !important;
+    }
+    
+    #ref-pagination > div {
+      flex-direction: column;
+      align-items: center !important;
+      gap: 1rem !important;
+    }
+    
+    #ref-pagination-info {
+      text-align: center;
+      font-size: 0.875rem;
+    }
+    
+    #ref-pagination-controls {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    #ref-pagination .page-link {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.875rem;
+    }
+  }
+  
+  /* Extra small devices */
+  @media (max-width: 575.98px) {
+    .reference-card-body {
+      padding: 0.875rem;
+    }
+    
+    .reference-card-title {
+      font-size: 0.95rem;
+      line-height: 1.3;
+    }
+    
+    .reference-card-badge {
+      padding: 0.2rem 0.6rem;
+      font-size: 0.65rem;
+    }
+    
+    .reference-card-btn {
+      padding: 0.45rem 0.875rem;
+      font-size: 0.875rem;
+    }
+    
+    .reference-filter-label {
+      font-size: 0.8rem;
+    }
+    
+    .reference-filter-input,
+    .reference-filter-select {
+      font-size: 0.8rem;
+      padding: 0.45rem 0.65rem;
+    }
+    
+    #ref-pagination .page-link {
+      padding: 0.35rem 0.5rem;
+      font-size: 0.8rem;
+    }
+    
+    /* Hide some page numbers on very small screens */
+    #ref-pagination .page-item:not(.active):not(:first-child):not(:last-child):not(.disabled) {
+      display: none;
+    }
+    
+    #ref-pagination .page-item.active + .page-item:not(.disabled),
+    #ref-pagination .page-item.active + .page-item + .page-item:not(.disabled) {
+      display: list-item;
+    }
+  }
+  
+  /* References Header - Mobile Optimizations */
+  @media (max-width: 767.98px) {
+    .references-header {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 1rem !important;
+    }
+    
+    .references-title {
+      width: 100%;
+      margin-bottom: 0;
+      font-size: 1.1rem;
+    }
+    
+    .references-items-per-page {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    #ref-items-per-page {
+      flex: 1;
+      max-width: 120px;
+      font-size: 0.875rem;
+    }
+  }
 
   /* === FMA PROFILE TABLE === */
   #fma-profile-container table tbody tr {
