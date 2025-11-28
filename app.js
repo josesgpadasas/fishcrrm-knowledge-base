@@ -946,21 +946,21 @@ async function loadReferences() {
     
     // Create filters HTML
     const filtersHTML = `
-      <div class="row g-3 align-items-end">
-        <div class="col-md-6">
-          <label class="form-label fw-bold mb-2" style="color: #151269;">
+      <div class="row g-3 align-items-end reference-filters">
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-bold mb-2 reference-filter-label" style="color: #151269;">
             <i class="bi bi-search me-1"></i>Search
           </label>
           <div class="input-group shadow-sm">
             <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-            <input type="text" class="form-control border-start-0 ps-0" id="ref-search" placeholder="Search files...">
+            <input type="text" class="form-control border-start-0 ps-0 reference-filter-input" id="ref-search" placeholder="Search files...">
           </div>
         </div>
-        <div class="col-md-6">
-          <label class="form-label fw-bold mb-2" style="color: #151269;">
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-bold mb-2 reference-filter-label" style="color: #151269;">
             <i class="bi bi-funnel me-1"></i>Category
           </label>
-          <select class="form-select shadow-sm" id="ref-filter-category">
+          <select class="form-select shadow-sm reference-filter-select" id="ref-filter-category">
             <option value="">All Categories</option>
             ${categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('')}
           </select>
@@ -1117,31 +1117,31 @@ async function loadReferences() {
       container.innerHTML = paginatedData.length ? paginatedData.map(r => {
         const category = r.CATEGORY || r.Category || 'Uncategorized';
         return `
-        <div class="card border-0 shadow-sm rounded-3 overflow-hidden transition-all hover-lift" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden transition-all hover-lift reference-card" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
           <!-- Header Bar -->
           <div class="card-header border-0 p-0" style="background: #151269; height: 4px;"></div>
           
-          <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div class="flex-grow-1 me-3">
-                <div class="d-flex align-items-center mb-2">
-                  <div class="rounded-circle p-2 me-3 flex-shrink-0" style="background: rgba(21, 18, 105, 0.1);">
-                    <i class="bi bi-file-earmark-pdf fs-5" style="color: #151269;"></i>
+          <div class="card-body reference-card-body">
+            <div class="d-flex justify-content-between align-items-start reference-card-content">
+              <div class="flex-grow-1 reference-card-info">
+                <div class="d-flex align-items-center reference-card-header">
+                  <div class="rounded-circle reference-card-icon flex-shrink-0" style="background: rgba(21, 18, 105, 0.1);">
+                    <i class="bi bi-file-earmark-pdf" style="color: #151269;"></i>
                   </div>
                   <div class="flex-grow-1">
-                    <h6 class="card-title mb-1 fw-bold" style="color: #151269; font-size: 1.1rem;">${escapeHtml(r.DOCUMENT_TITLE)}</h6>
-                    <span class="badge rounded-pill px-3 py-1 text-white" style="background: #0f1056; font-size: 0.75rem; font-weight: 600;">
+                    <h6 class="card-title mb-1 fw-bold reference-card-title" style="color: #151269;">${escapeHtml(r.DOCUMENT_TITLE)}</h6>
+                    <span class="badge rounded-pill reference-card-badge text-white" style="background: #0f1056; font-weight: 600;">
                       <i class="bi bi-tag me-1"></i>${escapeHtml(category)}
                     </span>
                   </div>
                 </div>
               </div>
               <a href="${r.FILE_URL}" 
-                 class="btn btn-sm rounded-pill fw-semibold d-flex align-items-center gap-2 text-white flex-shrink-0" 
-                 style="background: #0f1056; border: none; padding: 0.5rem 1.5rem; transition: all 0.3s ease;"
+                 class="btn btn-sm rounded-pill fw-semibold d-flex align-items-center gap-2 text-white flex-shrink-0 reference-card-btn" 
+                 style="background: #0f1056; border: none; transition: all 0.3s ease;"
                  target="_blank">
                 <i class="bi bi-box-arrow-up-right"></i>
-                Open Document
+                <span class="reference-card-btn-text">Open Document</span>
               </a>
             </div>
           </div>
